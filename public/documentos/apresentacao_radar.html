@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar Enche o Tanque — Tela de Apresentação</title>
+    <link rel="icon" href="Logo_maker_project.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #0c0f16;
+            color: #ffffff;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #canvas-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 24, 39, 0.8) 0%, rgba(3, 7, 18, 0.95) 100%);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(204, 255, 0, 0.05);
+        }
+
+        canvas {
+            display: block;
+            border-radius: 50%;
+        }
+
+        /* Ambient glows behind radar */
+        .ambient-glow {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(204, 255, 0, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: pulse-glow 4s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.08); opacity: 1; }
+        }
+
+        /* Floating controller and back button */
+        .control-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-bottom: 3px solid #ccff00;
+            padding: 14px 24px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            transition: opacity 0.3s, transform 0.3s;
+            max-width: 90vw;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-panel:hover {
+            border-color: rgba(204, 255, 0, 0.5);
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 18px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .control-btn:hover {
+            background: rgba(204, 255, 0, 0.1);
+            border-color: #ccff00;
+            color: #ccff00;
+            transform: translateY(-1px);
+        }
+
+        .control-btn.primary {
+            background: #ccff00;
+            color: #000000;
+            border: none;
+        }
+
+        .control-btn.primary:hover {
+            background: #e6ff66;
+            color: #000000;
+            box-shadow: 0 0 15px rgba(204, 255, 0, 0.4);
+        }
+
+        .control-btn.recording {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+            animation: pulse-red 1.5s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .back-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            color: #ccff00;
+            border-color: rgba(204, 255, 0, 0.3);
+            background: rgba(204, 255, 0, 0.05);
+        }
+
+        /* Top Left University Branding */
+        .top-left-branding {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            text-align: left;
+            z-index: 90;
+            pointer-events: none;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            border-left: 3px solid #ccff00;
+            padding-left: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            transition: opacity 0.3s;
+        }
+
+        .top-left-branding .small-text {
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.45);
+            font-weight: 550;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .top-left-branding .medium-text {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #ccff00;
+            letter-spacing: 0.01em;
+            text-shadow: 0 0 10px rgba(204, 255, 0, 0.2);
+        }
+
+        .top-left-branding .sub-text {
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.82);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .top-left-branding .date-text {
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        /* Tip overlay */
+        .presentation-note {
+            position: absolute;
+            top: 25px;
+            right: 190px;
+            background: rgba(17, 24, 39, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 320px;
+            text-align: right;
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        /* UCP Brand at top right */
+        .ucp-brand {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            z-index: 100;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ucp-brand img {
+            height: 65px !important;
+            width: auto !important;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.75));
+        }
+
+        /* Branding subtitles on screen */
+        .screen-brand {
+            position: absolute;
+            top: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 10;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        .screen-brand h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            color: #ffffff;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .screen-brand h1 span {
+            color: #FFB900; 
+        }
+
+        .screen-brand p {
+            font-size: 0.75rem;
+            letter-spacing: 0.25em;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-top: 4px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* Hide interface for pristine display mode */
+        body.hide-ui .presentation-note,
+        body.hide-ui .control-panel,
+        body.hide-ui .back-btn {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Logo CTA Styling */
+        .center-logo-cta {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 152px;
+            height: 152px;
+            border-radius: 50%;
+            z-index: 20;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            overflow: hidden;
+        }
+        .center-logo-cta:hover {
+            transform: translate(-50%, -50%) scale(1.08);
+        }
+        .center-logo-cta img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        body.hide-ui .center-logo-cta {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="brand-header-nav" style="background: #000000; border: 1px solid #1f2937; border-bottom: 3px solid #ccff00; padding: 15px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; border-radius: 12px; margin-bottom: 30px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.15); max-width: 100%; box-sizing: border-box; color: #f8fafc; text-align: left;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="/Logo_maker_project.png" alt="Logo Enche o Tanque" style="width: 48px; height: 48px; object-fit: contain;" referrerpolicy="no-referrer">
+        <div>
+            <div style="font-size: 1.15rem; font-weight: 800; tracking: tight; color: #ffffff; line-height: 1.2;">ENCHE O <span style="color: #ccff00;">TANQUE</span></div>
+            <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; line-height: 1.2;">Ecossistema Inteligente de Combustíveis</div>
+        </div>
+    </div>
+    <nav style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <a href="https://app.encheotanque.net.br" style="font-size: 0.8rem; font-weight: 700; color: #ccff00; text-decoration: none; padding: 5px 12px; border: 1px solid rgba(204, 255, 0, 0.4); border-radius: 6px; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.background='rgba(204,255,0,0.15)'" onmouseout="this.style.background='transparent'">IR PARA O APP ➔</a>
+        <a href="./RELATORIO_PROJETO.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Relatório</a>
+        <a href="./Relatorio_Atividades_Semestre.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Atividades</a>
+        <a href="./doc.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Escopo</a>
+        <a href="./Analise_Concorrencia.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Concorrência</a>
+        <a href="./Analise_Expansao_Rede.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Expansão</a>
+        <a href="./Gestao_Seguranca_Veiculos.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Segurança</a>
+        <a href="./Status_Arquitetura.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Arquitetura</a>
+        <a href="./BUSINESS_RULES.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Regras</a>
+        <a href="./backlog.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Roadmap</a>
+        <a href="./apresentacao_radar.html" style="font-size: 0.78rem; font-weight: 700; color: #ccff00; text-decoration: none; padding: 4px 8px; background: rgba(204, 255, 0, 0.1); border: 1px solid rgba(204, 255, 0, 0.3); border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ffffff'; this.style.background='rgba(204,255,0,0.2)'" onmouseout="this.style.color='#ccff00'; this.style.background='rgba(204,255,0,0.1)'">📺 Apresentação</a>
+        <a href="./mapa-implantacao-sudeste.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Sudeste</a>
+    </nav>
+</div>
+<h1>ENCHE O <span>TANQUE</span></h1>
+            <div style="font-size: 0.65rem; color: #ccff00; font-weight: 800; letter-spacing: 0.18em; text-align: center; margin: 6px 0; line-height: 1.4; text-shadow: 0 0 10px rgba(204, 255, 0, 0.8), 0 0 3px rgba(204, 255, 0, 0.4); text-transform: uppercase;">
+                ABASTEÇA COM INTELIGÊNCIA<br>RODE COM ECONOMIA
+            </div>
+            <p style="text-align: center; margin-top: 4px; letter-spacing: 0.15em;">APRESENTAÇÃO DO PROJETO</p>
+        </div>
+    </div>
+
+    <div class="ambient-glow"></div>
+
+    <div id="canvas-container">
+        <canvas id="radarCanvas" width="600" height="600"></canvas>
+        <!-- Center Logo PDF CTA -->
+        <a href="Documentacao_EncheOTanque.pdf" target="_blank" class="center-logo-cta" title="Visualizar Documentação Completa (PDF)">
+            <img src="/documentos/Logo_maker_project.png" alt="Enche o Tanque" referrerPolicy="no-referrer">
+        </a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('radarCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const cx = width / 2;
+        const cy = height / 2;
+        const radius = width / 2 - 20;
+
+        // Variables for animation
+        let sweepAngle = 0;
+        const sweepSpeed = 0.025; // Radial speed (radians per frame)
+        
+        // Dynamic expanding waves
+        const waves = [
+            { r: 0.1, opacity: 0.8 },
+            { r: 0.4, opacity: 0.5 },
+            { r: 0.7, opacity: 0.2 }
+        ];
+
+        // Load Logo to draw inside canvas
+        const logoImg = new Image();
+        logoImg.src = '/documentos/Logo_maker_project.png';
+        logoImg.referrerPolicy = 'no-referrer';
+
+        // Load Brazil Map SVG to draw in the background
+        const mapImg = new Image();
+        mapImg.src = '/documentos/br.svg';
+        mapImg.referrerPolicy = 'no-referrer';
+
+        // Background grid dots & static circles coordinates
+        const numStaticCircles = 3;
+
+        function drawRadar() {
+            // Clear canvas
+            ctx.fillStyle = '#0b0d19';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw radial gradients inside
+            const innerGrad = ctx.createRadialGradient(cx, cy, 50, cx, cy, radius);
+            innerGrad.addColorStop(0, '#0c1220');
+            innerGrad.addColorStop(1, '#05070c');
+            ctx.fillStyle = innerGrad;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw Brazil Map softly in the background (centered and filling the radar)
+            if (mapImg.complete && mapImg.naturalWidth !== 0) {
+                ctx.save();
+                ctx.globalAlpha = 0.10; // extremely subtle background map
+                const mapSize = radius * 2.0; // span nicely within the radar circle
+                ctx.drawImage(mapImg, cx - mapSize / 2 +40, cy - mapSize / 2, mapSize, mapSize);
+                ctx.restore();
+            }
+
+            // Draw static grid rings
+            ctx.strokeStyle = 'rgba(204, 255, 0, 0.08)';
+            ctx.lineWidth = 1.5;
+            for (let i = 1; i <= numStaticCircles; i++) {
+                ctx.beginPath();
+                ctx.arc(cx, cy, (radius / numStaticCircles) * i, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Draw crosshairs
+            ctx.strokeStyle = 'rgba(204, 255, 0, 0.05)';
+            ctx.beginPath();
+            ctx.moveTo(cx - radius, cy);
+            ctx.lineTo(cx + radius, cy);
+            ctx.moveTo(cx, cy - radius);
+            ctx.lineTo(cx, cy + radius);
+            ctx.stroke();
+
+            // Draw crosshair degrees indicators
+            ctx.fillStyle = 'rgba(204, 255, 0, 0.3)';
+            ctx.font = 'bold 9px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('000°', cx, cy - radius + 10);
+            ctx.fillText('180°', cx, cy + radius - 10);
+            ctx.fillText('090°', cx + radius - 15, cy);
+            ctx.fillText('270°', cx - radius + 15, cy);
+
+            // Draw concentric pulsing radar waves (Expansion wave animation)
+            waves.forEach(wave => {
+                wave.r += 0.0035;
+                if (wave.r > 1) {
+                    wave.r = 0;
+                    wave.opacity = 0.9;
+                } else {
+                    // fade out as it reaches border
+                    wave.opacity = (1 - wave.r) * 0.7;
+                }
+
+                ctx.strokeStyle = `rgba(204, 255, 0, ${wave.opacity})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius * wave.r, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+
+            // Update & Draw radar sweep sector trace (the glowing trail wedge)
+            sweepAngle = (sweepAngle + sweepSpeed) % (Math.PI * 2);
+
+            // Let's draw the trace as dynamic sector slices to create a beautiful realistic fade gradient trail
+            const trailSlices = 50;
+            const sliceAngle = 1.0; // Span of trail in radians (approx 60 degrees)
+
+            for (let i = 0; i < trailSlices; i++) {
+                const ratio = i / trailSlices; // 0 to 1
+                const angle = sweepAngle - ratio * sliceAngle;
+                const opacity = Math.pow(1 - ratio, 2) * 0.28; // conic trail fade
+
+                ctx.fillStyle = `rgba(204, 255, 0, ${opacity})`;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, radius, angle, angle + (sliceAngle / trailSlices));
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            // Draw leading super bright green line
+            ctx.strokeStyle = '#ccff00';
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = '#ccff00';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(sweepAngle) * radius, cy + Math.sin(sweepAngle) * radius);
+            ctx.stroke();
+            ctx.shadowBlur = 0; // reset shadow
+
+            // Draw glowing yellow center marker dot
+            ctx.fillStyle = '#ccff00';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw Logo at center beautifully
+            if (logoImg.complete && logoImg.naturalWidth !== 0) {
+                const logoSize = 152;
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(cx, cy, logoSize / 2, 0, Math.PI * 2);
+                ctx.clip();
+                ctx.shadowColor = 'rgba(0, 255, 0, 0.4)';
+                ctx.shadowBlur = 15;
+                try {
+                    ctx.drawImage(logoImg, cx - logoSize / 2, cy - logoSize / 2, logoSize, logoSize);
+                } catch (e) {
+                    console.error("Error drawing logo inside canvas sweep:", e);
+                }
+                ctx.restore();
+            }
+
+            // Outer border of radar
+            ctx.strokeStyle = '#ccff00';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Loop smoothly
+            requestAnimationFrame(drawRadar);
+        }
+
+        // Start animation loop immediately
+        drawRadar();
+
+        // Toggle plain pristine mode for absolute clean TV display
+        function togglePlainMode() {
+            document.body.classList.toggle('hide-ui');
+        }
+
+        // Detect click anywhere to restore UI if blank
+        document.body.addEventListener('click', (e) => {
+            if (document.body.classList.contains('hide-ui') && e.target.tagName !== 'BUTTON') {
+                document.body.classList.remove('hide-ui');
+            }
+        });
+
+        // ESC also restores UI
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.body.classList.remove('hide-ui');
+            }
+        });
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch((err) => {
+                    alert(`Não foi possível ativar tela cheia: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Recorder Engine: Loop Capture to high-quality `.webm` video!
+        let isRecording = false;
+        async function recordRadar() {
+            if (isRecording) return;
+            isRecording = true;
+
+            const recordBtn = document.getElementById('record-btn');
+            recordBtn.innerText = '🔴 gravando loop...';
+            recordBtn.classList.add('recording');
+
+            // 1. Capture stream with 60FPS fluid quality
+            const stream = canvas.captureStream(60);
+            
+            // 2. Select codec safely based on browser compatibility (WebM is highly standard)
+            let options = { mimeType: 'video/webm;codecs=vp9,opus' };
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                options = { mimeType: 'video/webm;codecs=vp8' };
+            }
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                options = { mimeType: 'video/webm' };
+            }
+
+            const mediaRecorder = new MediaRecorder(stream, options);
+            const chunks = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) {
+                    chunks.push(e.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                
+                // Trigger auto-download
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'enche_o_tanque_radar_loop.webm';
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+
+                recordBtn.innerText = '⏺ Gravar Loop (10s)';
+                recordBtn.classList.remove('recording');
+                isRecording = false;
+                alert('🎉 Vídeo gerado com sucesso! Arquivo "enche_o_tanque_radar_loop.webm" baixado.');
+            };
+
+            // Start recording chunks
+            mediaRecorder.start();
+
+            // Record precisely for 10 seconds (enough for several perfect loops of radar sweeps)
+            setTimeout(() => {
+                mediaRecorder.stop();
+            }, 10000);
+        }
+    </script>
+</body>
+</html>

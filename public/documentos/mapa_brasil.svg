@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+      <style>
+        .map-line { fill: none; stroke: #ccff00; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0.75; }
+        .region-line { fill: none; stroke: #ccff00; stroke-width: 1.0; stroke-dasharray: 4,4; opacity: 0.5; }
+        .state-label { fill: #ccff00; font-family: monospace; font-size: 10px; opacity: 0.4; }
+      </style>
+      <g transform="translate(50, 50) scale(0.85)">
+        <!-- Beautiful abstract outline of Brazil states & regions -->
+        <!-- North Region (Amazonas, Pará, Roraima, Amapá, Acre, Rondônia, Tocantins) -->
+        <path class="map-line" d="M 50,200 L 100,100 L 180,80 L 250,50 L 320,110 L 300,180 L 200,250 L 110,240 Z" />
+        <path class="region-line" d="M 100,100 L 200,180 M 180,80 L 180,250 M 250,50 L 250,180" />
+        
+        <!-- Northeast Region (Maranhão, Piauí, Ceará, RN, PB, PE, AL, SE, Bahia) -->
+        <path class="map-line" d="M 320,110 L 400,140 L 450,150 L 480,180 L 460,220 L 410,290 L 350,280 L 300,180 Z" />
+        <path class="region-line" d="M 320,110 L 370,220 M 400,140 L 400,280 M 450,150 L 320,180" />
+
+        <!-- Central-West (Mato Grosso, MS, Goiás, DF) -->
+        <path class="map-line" d="M 200,250 L 300,180 L 350,280 L 310,380 L 220,380 L 160,330 Z" />
+        <path class="region-line" d="M 200,250 L 310,380 M 300,180 L 220,380" />
+
+        <!-- Southeast (Minas Gerais, Espírito Santo, Rio de Janeiro, São Paulo) -->
+        <path class="map-line" d="M 350,280 L 410,290 L 430,340 L 390,380 L 310,380 Z" />
+        <path class="region-line" d="M 350,280 L 350,380 M 310,380 L 430,340" stroke-dasharray="3,3" />
+
+        <!-- South (Paraná, Santa Catarina, Rio Grande do Sul) -->
+        <path class="map-line" d="M 220,380 L 310,380 L 300,430 L 280,500 L 250,470 L 210,420 Z" />
+        <path class="region-line" d="M 220,380 L 280,500 M 310,380 L 250,470" stroke-dasharray="3,3" />
+        
+        <!-- Regional divisions and text markers for absolute realism -->
+        <text x="120" y="160" class="state-label">AM</text>
+        <text x="220" y="120" class="state-label">PA</text>
+        <text x="310" y="80" class="state-label">AP</text>
+        <text x="70" y="220" class="state-label">AC</text>
+        <text x="140" y="230" class="state-label">RO</text>
+        <text x="270" y="210" class="state-label">TO</text>
+        
+        <text x="330" y="140" class="state-label">MA</text>
+        <text x="360" y="150" class="state-label">PI</text>
+        <text x="400" y="120" class="state-label">CE</text>
+        <text x="440" y="140" class="state-label">RN</text>
+        <text x="455" y="165" class="state-label">PE</text>
+        <text x="390" y="220" class="state-label">BA</text>
+        <text x="440" y="210" class="state-label">SE</text>
+        
+        <text x="230" y="300" class="state-label">MT</text>
+        <text x="290" y="270" class="state-label">GO</text>
+        <text x="240" y="350" class="state-label">MS</text>
+        
+        <text x="350" y="320" class="state-label">MG</text>
+        <text x="410" y="320" class="state-label">ES</text>
+        <text x="390" y="355" class="state-label">RJ</text>
+        <text x="330" y="365" class="state-label">SP</text>
+        
+        <text x="270" y="400" class="state-label">PR</text>
+        <text x="275" y="430" class="state-label">SC</text>
+        <text x="260" y="470" class="state-label">RS</text>
+      </g>
+    </svg>

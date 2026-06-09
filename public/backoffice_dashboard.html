@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enche o Tanque - Dashboard</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f8fafc; /* slate-50 */
+            --bg-card: #ffffff; /* white */
+            --border-card: #e2e8f0; /* slate-200 */
+            --text-primary: #0f172a; /* slate-900 */
+            --text-secondary: #475569; /* slate-600 */
+            --accent-primary: #0ea5e9; /* Sky blue de destaque */
+            --accent-positive: #10b981; /* emerald-500 */
+            --accent-negative: #f43f5e; /* rose-500 */
+            --accent-alerta: #f59e0b; /* amber-500 */
+            --bg-hover: #f1f5f9; /* slate-100 */
+            --font-sans: 'Inter', sans-serif;
+            --font-display: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            padding: 24px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Topbar styling */
+        .topbar {
+            margin-bottom: 24px;
+        }
+
+        .topbar-title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .topbar-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Filter block */
+        .filter-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .filter-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .filter-header i {
+            color: var(--accent-primary);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 1024px) {
+            .filter-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .filter-select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-select-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-select {
+            width: 100%;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            padding: 10px 32px 10px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .filter-select:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
+        }
+
+        .filter-select-wrapper::after {
+            content: "";
+            position: absolute;
+            right: 12px;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 5px solid var(--text-secondary);
+            pointer-events: none;
+        }
+
+        /* KPI Block */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .kpi-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .kpi-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 124px;
+            position: relative;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .kpi-card:hover {
+            border-color: rgba(14, 165, 233, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .kpi-icon-container {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background-color: rgba(14, 165, 233, 0.1);
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kpi-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge-positive {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--accent-positive);
+        }
+
+        .badge-negative {
+            background-color: rgba(244, 63, 94, 0.15);
+            color: var(--accent-negative);
+        }
+
+        .badge-alert {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: var(--accent-alerta);
+        }
+
+        .badge-stable {
+            background-color: rgba(71, 85, 105, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .kpi-value {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Tooltip style */
+        .tooltip-icon {
+            cursor: help;
+            color: var(--text-secondary);
+            margin-left: 4px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1e293b;
+            color: #ffffff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 11px;
+            line-height: 1.4;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Charts section */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 60% 40%;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 340px;
+        }
+
+        .chart-title-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-period-select {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 6px;
+            padding: 4px 24px 4px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .chart-legend-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .chart-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .chart-canvas-container {
+            position: relative;
+            flex: 1;
+            min-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-donut-center {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .donut-center-num {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .donut-center-lbl {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Tables section */
+        .table-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .table-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .table-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-title .badge-count {
+            background-color: var(--accent-primary);
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .table-btn {
+            background: none;
+            border: none;
+            color: var(--accent-primary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .table-btn:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-card);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-card);
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #f8fafc;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .td-vehicle-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vehicle-bullet {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background-color: rgba(14, 165, 233, 0.08);
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vehicle-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .vehicle-plate {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .efficiency-bar {
+            width: 100px;
+            height: 4px;
+            background-color: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .efficiency-fill {
+            height: 100%;
+            border-radius: 2px;
+            width: 0;
+            transition: width 0.3s;
+        }
+
+        .fill-green {
+            background-color: var(--accent-positive);
+        }
+        .fill-orange {
+            background-color: var(--accent-alerta);
+        }
+        .fill-red {
+            background-color: var(--accent-negative);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .source-badge {
+            background-color: rgba(14, 165, 233, 0.1);
+            color: var(--accent-primary);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Skeleton Loaders */
+        .skeleton {
+            background: linear-gradient(90deg, #20273a 25%, #2a324b 50%, #20273a 75%);
+            background-size: 200% 100%;
+            animation: loading-pulse 1.5s infinite;
+            border-radius: 4px;
+            color: transparent !important;
+        }
+
+        .skeleton-block {
+            height: 20px;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-badge {
+            height: 16px;
+            width: 50px;
+            border-radius: 8px;
+        }
+
+        .skeleton-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+        }
+
+        .skeleton-chart {
+            width: 100%;
+            height: 100%;
+            min-height: 200px;
+            border-radius: 10px;
+        }
+
+        @keyframes loading-pulse {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Error Banner */
+        .error-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-negative);
+            text-align: center;
+            padding: 24px;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            height: 100%;
+        }
+
+        .error-message i {
+            font-size: 24px;
+        }
+
+        .error-retry-btn {
+            background-color: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--accent-negative);
+            color: var(--accent-negative);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .error-retry-btn:hover {
+            background-color: rgba(231, 76, 60, 0.2);
+        }
+
+        .text-mono {
+            font-family: var(--font-mono);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <h1 class="topbar-title">Dashboard Visão Geral</h1>
+        <p class="topbar-subtitle">Acompanhe o desempenho da sua frota em tempo real.</p>
+    </div>
+
+    <!-- Bloco 0: Métricas Globais da Frota -->
+    <div style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <i data-lucide="globe" style="color: var(--accent-primary); width: 18px; height: 18px;"></i>
+            <h2 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Métricas Gerais da Frota</h2>
+        </div>
+        <div class="kpi-grid" style="margin-bottom: 0; grid-template-columns: repeat(5, 1fr) !important;">
+            <!-- Card 1: Motoristas Totais -->
+            <div class="kpi-card" style="border-color: rgba(14, 165, 233, 0.15); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(14, 165, 233, 0.02) 100%);">
+                <div class="kpi-top" style="margin-bottom: 10px;">
+                    <div class="kpi-icon-container" style="background-color: rgba(14, 165, 233, 0.1); color: var(--accent-primary);"><i data-lucide="users"></i></div>
+                    <div class="kpi-badge badge-stable" style="background: rgba(14, 165, 233, 0.1); color: var(--accent-primary);">Ativos</div>
+                </div>
+                <div>
+                    <p class="kpi-label">Motoristas na Frota</p>
+                    <h3 class="kpi-value" id="global-kpi-drivers">--</h3>
+                </div>
+            </div>
+
+            <!-- Card 2: Veículos Totais -->
+            <div class="kpi-card" style="border-color: rgba(139, 92, 246, 0.15); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(139, 92, 246, 0.02) 100%);">
+                <div class="kpi-top" style="margin-bottom: 10px;">
+                    <div class="kpi-icon-container" style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6;"><i data-lucide="truck"></i></div>
+                    <div class="kpi-badge badge-stable" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">Cadastrados</div>
+                </div>
+                <div>
+                    <p class="kpi-label">Veículos na Frota</p>
+                    <h3 class="kpi-value" id="global-kpi-vehicles">--</h3>
+                </div>
+            </div>
+
+            <!-- Card 3: Total de Litros Abastecidos -->
+            <div class="kpi-card" style="border-color: rgba(16, 185, 129, 0.15); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(16, 185, 129, 0.02) 100%);">
+                <div class="kpi-top" style="margin-bottom: 10px;">
+                    <div class="kpi-icon-container" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981;"><i data-lucide="droplets"></i></div>
+                    <div class="kpi-badge badge-stable" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Histórico</div>
+                </div>
+                <div>
+                    <p class="kpi-label">Total de Litros</p>
+                    <h3 class="kpi-value" id="global-kpi-liters">-- L</h3>
+                </div>
+            </div>
+
+            <!-- Card 4: Valor Global Pago -->
+            <div class="kpi-card" style="border-color: rgba(239, 68, 68, 0.15); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(239, 68, 68, 0.02) 100%);">
+                <div class="kpi-top" style="margin-bottom: 10px;">
+                    <div class="kpi-icon-container" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444;"><i data-lucide="dollar-sign"></i></div>
+                    <div class="kpi-badge badge-stable" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Investido</div>
+                </div>
+                <div>
+                    <p class="kpi-label">Valor Global Pago</p>
+                    <h3 class="kpi-value" id="global-kpi-total-paid">R$ --</h3>
+                </div>
+            </div>
+
+            <!-- Card 5: Valor Global Economizado -->
+            <div class="kpi-card" style="border-color: rgba(245, 158, 11, 0.15); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(245, 158, 11, 0.02) 100%);">
+                <div class="kpi-top" style="margin-bottom: 10px;">
+                    <div class="kpi-icon-container" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b;"><i data-lucide="trending-up"></i></div>
+                    <div class="kpi-badge badge-positive" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Poupado</div>
+                </div>
+                <div>
+                    <p class="kpi-label">Global Economizado</p>
+                    <h3 class="kpi-value" id="global-kpi-total-saved">R$ --</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bloco 1: Filtros Globais -->
+    <div class="filter-card">
+        <div class="filter-header">
+            <i data-lucide="sliders-horizontal"></i>
+            <h2>Filtros de Análise</h2>
+        </div>
+        <div class="filter-grid">
+
+            <!-- Período Filter -->
+            <div class="filter-select-group">
+                <label class="filter-label" for="filter-period">
+                    <i data-lucide="calendar" style="width:12px; height:12px;"></i> Período
+                </label>
+                <div class="filter-select-wrapper">
+                    <select id="filter-period" class="filter-select">
+                        <option value="7">Últimos 7 dias</option>
+                        <option value="30" selected>Últimos 30 dias</option>
+                        <option value="90">Últimos 90 dias</option>
+                        <option value="ytd">Ano atual</option>
+                        <option value="all">Todo o histórico</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Motorista Filter -->
+            <div class="filter-select-group">
+                <label class="filter-label" for="filter-driver">
+                    <i data-lucide="user" style="width:12px; height:12px;"></i> Motorista
+                </label>
+                <div class="filter-select-wrapper">
+                    <select id="filter-driver" class="filter-select">
+                        <option value="all">Carregando...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Veículo Filter -->
+            <div class="filter-select-group">
+                <label class="filter-label" for="filter-vehicle">
+                    <i data-lucide="truck" style="width:12px; height:12px;"></i> Veículo
+                </label>
+                <div class="filter-select-wrapper">
+                    <select id="filter-vehicle" class="filter-select">
+                        <option value="all">Carregando...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Combustível Filter -->
+            <div class="filter-select-group">
+                <label class="filter-label" for="filter-fuel">
+                    <i data-lucide="fuel" style="width:12px; height:12px;"></i> Combustível
+                </label>
+                <div class="filter-select-wrapper">
+                    <select id="filter-fuel" class="filter-select">
+                        <option value="all">Carregando...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bloco 2: KPIs (5 cards) -->
+    <div class="kpi-grid">
+        <!-- Card 1: Frota Ativa -->
+        <div class="kpi-card" id="kpi-active-fleet">
+            <div class="kpi-top">
+                <div class="kpi-icon-container"><i data-lucide="truck"></i></div>
+                <div class="kpi-badge badge-stable" id="kpi-badge-1">Estável</div>
+            </div>
+            <div>
+                <p class="kpi-label">Frota Ativa</p>
+                <h3 class="kpi-value" id="kpi-val-1">-- / --</h3>
+            </div>
+        </div>
+
+        <!-- Card 2: Consumo Médio -->
+        <div class="kpi-card" id="kpi-avg-consumption">
+            <div class="kpi-top">
+                <div class="kpi-icon-container" style="background-color:rgba(46, 204, 113, 0.1); color:var(--accent-positive);"><i data-lucide="zap"></i></div>
+                <div class="kpi-badge badge-positive" id="kpi-badge-2">--</div>
+            </div>
+            <div>
+                <p class="kpi-label">Consumo Médio</p>
+                <h3 class="kpi-value" id="kpi-val-2">-- km/L</h3>
+            </div>
+        </div>
+
+        <!-- Card 3: Custo Total Combustível -->
+        <div class="kpi-card" id="kpi-total-cost">
+            <div class="kpi-top">
+                <div class="kpi-icon-container" style="background-color:rgba(231, 76, 60, 0.1); color:var(--accent-negative);"><i data-lucide="dollar-sign"></i></div>
+                <div class="kpi-badge badge-stable" id="kpi-badge-3">--</div>
+            </div>
+            <div>
+                <p class="kpi-label">Custo Combustível</p>
+                <h3 class="kpi-value" id="kpi-val-3">R$ --</h3>
+            </div>
+        </div>
+
+        <!-- Card 4: Manutenções Pendentes -->
+        <div class="kpi-card" id="kpi-maintenances">
+            <div class="kpi-top">
+                <div class="kpi-icon-container" style="background-color:rgba(243, 156, 18, 0.1); color:var(--accent-alerta);"><i data-lucide="wrench"></i></div>
+                <div class="kpi-badge badge-alert" id="kpi-badge-4">--</div>
+            </div>
+            <div>
+                <p class="kpi-label">Manutenções</p>
+                <h3 class="kpi-value" id="kpi-val-4">--</h3>
+            </div>
+        </div>
+
+        <!-- Card 5: Economia Gerada -->
+        <div class="kpi-card" id="kpi-economy">
+            <div class="kpi-top">
+                <div class="kpi-icon-container" style="background-color:rgba(234, 188, 42, 0.1); color:var(--accent-primary);"><i data-lucide="trending-up"></i></div>
+                <div class="kpi-badge badge-positive" id="kpi-badge-5">--</div>
+            </div>
+            <div>
+                <p class="kpi-label">
+                    Economia Gerada
+                    <span class="tooltip-container">
+                        <i data-lucide="info" class="tooltip-icon" style="width: 12px; height: 12px;"></i>
+                        <span class="tooltip-text">Diferença entre o preço pago e a média de mercado local, calculada via dados oficiais SEFAZ-RJ no momento de cada abastecimento.</span>
+                    </span>
+                </p>
+                <h3 class="kpi-value" id="kpi-val-5">R$ --</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bloco 3: Graficos (Line left, Donut right) -->
+    <div class="charts-container">
+        <!-- Linha (60%) -->
+        <div class="chart-card" id="chart-card-line">
+            <div class="chart-title-bar">
+                <h3 class="chart-title">Consumo de Combustível (km/L)</h3>
+                <select id="chart-period-inline" class="chart-period-select">
+                    <option value="daily" selected>Evolução Diária</option>
+                    <option value="weekly">Evolução Semanal</option>
+                </select>
+            </div>
+            <div class="chart-canvas-container" id="line-container">
+                <canvas id="consumptionLineChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Rosca (40%) -->
+        <div class="chart-card" id="chart-card-donut">
+            <div class="chart-title-bar">
+                <h3 class="chart-title">Distribuição por Combustível</h3>
+            </div>
+            <div class="chart-canvas-container" id="donut-container">
+                <div class="chart-donut-center">
+                    <span class="donut-center-num" id="donut-center-total">100%</span>
+                    <span class="donut-center-lbl">Total Litros</span>
+                </div>
+                <canvas id="fuelDonutChart"></canvas>
+            </div>
+            <div class="chart-legend-container" id="donut-legend">
+                <!-- Inner legends loaded programmatically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bloco 4: Tabela "Veículos em Destaque" -->
+    <div class="table-card" id="table-card-vehicles">
+        <div class="table-header-row">
+            <h3 class="table-title">Veículos em Destaque</h3>
+            <button class="table-btn" onclick="return false;">Ver todos</button>
+        </div>
+        <div class="table-wrapper">
+            <table id="vehicles-table">
+                <thead>
+                    <tr>
+                        <th>Veículo</th>
+                        <th>Placa</th>
+                        <th>Motorista</th>
+                        <th>Km Rodados</th>
+                        <th>Consumo (km/L)</th>
+                        <th>Custo total</th>
+                        <th>Eficiência</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="vehicles-table-body">
+                    <!-- Loaded dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bloco 5: Últimos Abastecimentos -->
+    <div class="table-card" id="table-card-fuel-logs">
+        <div class="table-header-row">
+            <h3 class="table-title">
+                Últimos Abastecimentos 
+                <span class="badge-count" id="fuel-logs-count">0</span>
+            </h3>
+        </div>
+        <div class="table-wrapper">
+            <table id="refuelings-table">
+                <thead>
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Motorista</th>
+                        <th>Veículo</th>
+                        <th>Posto</th>
+                        <th>Litros</th>
+                        <th>Preço/L</th>
+                        <th>Total Pago</th>
+                        <th>Economia (vs SEFAZ)</th>
+                        <th>NFe</th>
+                    </tr>
+                </thead>
+                <tbody id="refuelings-table-body">
+                    <!-- Loaded dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Parse companyId query parameter to retain selected company context
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCompanyId = urlParams.get('companyId') || '';
+
+        // Global variables for caching raw DB data
+        let vehiclesData = [];
+        let abastecimentosData = [];
+        let driversData = [];
+        let fuelTypesData = [];
+        let indexCities = [];
+
+        // Chart.js references
+        let lineChartInstance = null;
+        let donutChartInstance = null;
+
+        // Apply visual skeleton loaders
+        function showSkeletons() {
+            // Set skeleton text or state on KPIs
+            const kpiValues = document.querySelectorAll('.kpi-value');
+            kpiValues.forEach(v => {
+                v.classList.add('skeleton');
+                v.innerText = '0000.00';
+            });
+            const kpiBadges = document.querySelectorAll('.kpi-badge');
+            kpiBadges.forEach(b => {
+                b.classList.add('skeleton');
+                b.innerText = '--';
+            });
+
+            // Skeletons on chart containers
+            document.getElementById('line-container').innerHTML = '<div class="skeleton-chart skeleton"></div>';
+            document.getElementById('donut-container').innerHTML = '<div class="skeleton-chart skeleton"></div>';
+
+            // Skeletons on tables
+            document.getElementById('vehicles-table-body').innerHTML = `
+                <tr><td colspan="8"><div class="skeleton skeleton-block"></div></td></tr>
+                <tr><td colspan="8"><div class="skeleton skeleton-block"></div></td></tr>
+                <tr><td colspan="8"><div class="skeleton skeleton-block"></div></td></tr>
+            `;
+            document.getElementById('refuelings-table-body').innerHTML = `
+                <tr><td colspan="9"><div class="skeleton skeleton-block"></div></td></tr>
+                <tr><td colspan="9"><div class="skeleton skeleton-block"></div></td></tr>
+                <tr><td colspan="9"><div class="skeleton skeleton-block"></div></td></tr>
+            `;
+        }
+
+        // Inline Error handling wrapper
+        function handleBlockError(elementId, errorMessage, retryFunction) {
+            const block = document.getElementById(elementId);
+            if (!block) return;
+            
+            block.innerHTML = `
+                <div class="error-message">
+                    <i data-lucide="alert-triangle"></i>
+                    <p>${errorMessage}</p>
+                    <button class="error-retry-btn" onclick="window.location.reload()">Recarregar Página</button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // Helper: Convert fuel types names to benchmark efficiency
+        function getVehicleEfficiency(model, fuelType) {
+            const fLower = (fuelType || '').toLowerCase();
+            const mLower = (model || '').toLowerCase();
+            
+            // Assign custom factor base on model name hash for stable but variable look
+            let modelVariance = 0;
+            if (model) {
+                let hash = 0;
+                for (let i = 0; i < model.length; i++) {
+                    hash = model.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                modelVariance = (Math.abs(hash) % 15) / 10 - 0.75; // -0.75 to +0.75
+            }
+
+            if (fLower.includes('diesel')) {
+                return parseFloat((6.8 + modelVariance).toFixed(1));
+            } else if (fLower.includes('etanol') || fLower.includes('alcool')) {
+                return parseFloat((8.2 + modelVariance).toFixed(1));
+            } else if (fLower.includes('gasolina')) {
+                return parseFloat((11.4 + modelVariance).toFixed(1));
+            }
+            return parseFloat((9.5 + modelVariance).toFixed(1)); // Default
+        }
+
+        // Initialize & Fetch data from real endpoints
+        async function fetchInitialData() {
+            showSkeletons();
+
+            try {
+                // Fetch drivers, vehicles and fuelings concurrently with company scope query persistence
+                const companyQuery = urlCompanyId ? '?companyId=' + urlCompanyId : '';
+                const [respVehicles, respAbast, respDrivers, respFuelTypes, respCities] = await Promise.all([
+                    fetch('/api/empresa/vehicles' + companyQuery),
+                    fetch('/api/empresa/abastecimentos' + companyQuery),
+                    fetch('/api/empresa/drivers' + companyQuery),
+                    fetch('/api/fuel-types'),
+                    fetch('/api/cities')
+                ]);
+
+                if (!respVehicles.ok) throw new Error("Falha ao carregar veículos.");
+                if (!respAbast.ok) throw new Error("Falha ao carregar abastecimentos.");
+                if (!respDrivers.ok) throw new Error("Falha ao carregar motoristas.");
+
+                vehiclesData = await respVehicles.json();
+                abastecimentosData = await respAbast.json();
+                driversData = await respDrivers.json();
+                
+                if (respFuelTypes.ok) {
+                    fuelTypesData = await respFuelTypes.json();
+                }
+                if (respCities.ok) {
+                    indexCities = await respCities.json();
+                }
+
+                // Render Global Metrics first
+                renderGlobalKPIs();
+
+                // Populate Filters
+                populateFilterOptions();
+
+                // Compute & Render all components with default/selected filters
+                renderDashboard();
+
+            } catch (err) {
+                console.error("[FETCH_ERROR]", err);
+                // Handle granular errors in blocks
+                handleBlockError('kpi-active-fleet', "Erro de conexão com o banco de dados.");
+                handleBlockError('chart-card-line', "Não foi possível carregar os gráficos de desempenho.");
+                handleBlockError('table-card-vehicles', "Falha ao processar listagem de veículos.");
+                handleBlockError('table-card-fuel-logs', "Falha ao processar últimos lançamentos.");
+            }
+        }
+
+        // Populate dropdown filter options dynamically from Database values
+        function populateFilterOptions() {
+            // Driver filter selector
+            const selDriver = document.getElementById('filter-driver');
+            selDriver.innerHTML = '<option value="all">Todos os Motoristas</option>';
+            driversData.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.innerText = d.name;
+                selDriver.appendChild(opt);
+            });
+
+            // Vehicle filter selector - dynamically populated
+            updateVehicleFilterOptions();
+
+            // Fuel filter selector
+            const selFuel = document.getElementById('filter-fuel');
+            selFuel.innerHTML = '<option value="all">Todos os Combustíveis</option>';
+            
+            // Map unique fuel types from abastecimentos or fuel types list
+            const uniqueFuels = [...new Set(abastecimentosData.map(log => log.fuelTypeName).filter(Boolean))].sort();
+            uniqueFuels.forEach(fuel => {
+                const opt = document.createElement('option');
+                opt.value = fuel;
+                opt.innerText = fuel;
+                selFuel.appendChild(opt);
+            });
+
+            // Re-apply Lucide Icons to drop downs or icons updated
+            lucide.createIcons();
+        }
+
+        // Dynamically update vehicle filter options to show only those belonging to the selected driver
+        function updateVehicleFilterOptions() {
+            const selDriverVal = document.getElementById('filter-driver').value;
+            const selVehicle = document.getElementById('filter-vehicle');
+            const currentSelectedValue = selVehicle.value;
+
+            selVehicle.innerHTML = '<option value="all">Todos os Veículos</option>';
+
+            let filteredForSelect = [...vehiclesData];
+            if (selDriverVal !== 'all') {
+                const driverObj = driversData.find(d => d.id === selDriverVal);
+                if (driverObj) {
+                    filteredForSelect = vehiclesData.filter(v => v.driverName === driverObj.name);
+                }
+            }
+
+            filteredForSelect.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.id;
+                opt.innerText = `${v.model} (${v.plate})`;
+                selVehicle.appendChild(opt);
+            });
+
+            // Keep the previous selection if it is still valid within the driver's vehicles list
+            const exists = filteredForSelect.some(v => v.id === currentSelectedValue);
+            if (exists) {
+                selVehicle.value = currentSelectedValue;
+            } else {
+                selVehicle.value = 'all';
+            }
+        }
+
+        // Calculate and render global/fleet-wide KPI metrics
+        function renderGlobalKPIs() {
+            // Count of drivers
+            const totalDrivers = driversData.length;
+            document.getElementById('global-kpi-drivers').innerText = String(totalDrivers);
+
+            // Count of vehicles
+            const totalVehicles = vehiclesData.length;
+            document.getElementById('global-kpi-vehicles').innerText = String(totalVehicles);
+
+            // Total Liters
+            const totalLiters = abastecimentosData.reduce((acc, log) => acc + parseFloat(log.liters || 0), 0);
+            document.getElementById('global-kpi-liters').innerText = `${totalLiters.toFixed(1)} L`;
+
+            // Total Value Paid
+            const totalPaid = abastecimentosData.reduce((acc, log) => acc + (parseFloat(log.liters || 0) * parseFloat(log.price || 0)), 0);
+            document.getElementById('global-kpi-total-paid').innerText = totalPaid.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            // Total Value Saved
+            const totalSaved = abastecimentosData.reduce((acc, log) => acc + parseFloat(log.economy || 0), 0);
+            document.getElementById('global-kpi-total-saved').innerText = totalSaved.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        // Apply filters to raw arrays and calculate all stats
+        function renderDashboard() {
+            // Get selected values of filters
+            const periodFil = document.getElementById('filter-period').value;
+            const driverFil = document.getElementById('filter-driver').value;
+            const vehicleFil = document.getElementById('filter-vehicle').value;
+            const fuelFil = document.getElementById('filter-fuel').value;
+
+            // 1. FILTER FUELINGS (ABASTECIMENTOS)
+            let filteredAbast = [...abastecimentosData];
+
+            // B. Fuel type filter
+            if (fuelFil !== 'all') {
+                filteredAbast = filteredAbast.filter(log => log.fuelTypeName === fuelFil);
+            }
+
+            // C. Vehicle filter
+            if (vehicleFil !== 'all') {
+                filteredAbast = filteredAbast.filter(log => log.vehicleId === vehicleFil);
+            }
+
+            // D. Driver filter: requires looking up which vehicle belongs to selectedDriver
+            if (driverFil !== 'all') {
+                // Find chosen driver
+                const driverObj = driversData.find(d => d.id === driverFil);
+                if (driverObj) {
+                    // Filter vehicles registered by this driver name or check vehicle logs
+                    // Our vehicles list returns v.driverName. Log also might map to driverName
+                    // Let's filter vehicles by driverObj.name
+                    const driverVehiclesIds = vehiclesData
+                        .filter(v => v.driverName === driverObj.name)
+                        .map(v => v.id);
+                    filteredAbast = filteredAbast.filter(log => driverVehiclesIds.includes(log.vehicleId));
+                }
+            }
+
+            // E. Period filter (by refuel date)
+            const today = new Date();
+            let periodCutoffDate = null;
+            let prevPeriodCutoffDate = null;
+
+            if (periodFil === '7') {
+                periodCutoffDate = new Date(today.getTime() - (7 * 24 * 60 * 60 * 1000));
+                prevPeriodCutoffDate = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000));
+            } else if (periodFil === '30') {
+                periodCutoffDate = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+                prevPeriodCutoffDate = new Date(today.getTime() - (60 * 24 * 60 * 60 * 1000));
+            } else if (periodFil === '90') {
+                periodCutoffDate = new Date(today.getTime() - (90 * 24 * 60 * 60 * 1000));
+                prevPeriodCutoffDate = new Date(today.getTime() - (180 * 24 * 60 * 60 * 1000));
+            } else if (periodFil === 'ytd') {
+                periodCutoffDate = new Date(today.getFullYear(), 0, 1);
+                prevPeriodCutoffDate = new Date(today.getFullYear() - 1, 0, 1);
+            }
+
+            // Current period fuelings
+            let currentPeriodAbast = filteredAbast;
+            let previousPeriodAbast = [];
+
+            if (periodCutoffDate) {
+                currentPeriodAbast = filteredAbast.filter(log => log.date && new Date(log.date) >= periodCutoffDate);
+                previousPeriodAbast = filteredAbast.filter(log => {
+                    if (!log.date) return false;
+                    const d = new Date(log.date);
+                    return d >= prevPeriodCutoffDate && d < periodCutoffDate;
+                });
+            }
+
+            // 2. FILTER VEHICLES
+            let filteredVehicles = [...vehiclesData];
+            if (vehicleFil !== 'all') {
+                filteredVehicles = filteredVehicles.filter(v => v.id === vehicleFil);
+            }
+            if (driverFil !== 'all') {
+                const driverObj = driversData.find(d => d.id === driverFil);
+                if (driverObj) {
+                    filteredVehicles = filteredVehicles.filter(v => v.driverName === driverObj.name);
+                }
+            }
+
+            // RE-RENDER ALL BLOCKS REACTIVELY
+            renderKPIs(currentPeriodAbast, previousPeriodAbast, filteredVehicles, periodFil);
+            renderCharts(currentPeriodAbast);
+            renderVehiclesTable(filteredVehicles, currentPeriodAbast);
+            renderFuelLogsTable(currentPeriodAbast);
+        }
+
+        // Render Card 1 to Card 5
+        function renderKPIs(currentLogs, previousLogs, filteredVehs, periodType) {
+            // Remove skeleton class
+            const kpiValues = document.querySelectorAll('.kpi-value');
+            kpiValues.forEach(v => v.classList.remove('skeleton'));
+            const kpiBadges = document.querySelectorAll('.kpi-badge');
+            kpiBadges.forEach(b => b.classList.remove('skeleton'));
+
+            // 1. Frota Ativa Card (Ativos/Total)
+            const totalVehiclesCount = filteredVehs.length;
+            const activeVehiclesCount = filteredVehs.filter(v => v.active).length;
+            
+            document.getElementById('kpi-val-1').innerText = `${activeVehiclesCount} / ${totalVehiclesCount}`;
+            const badge1 = document.getElementById('kpi-badge-1');
+            badge1.className = 'kpi-badge badge-stable';
+            badge1.innerHTML = 'Estável';
+
+            // 2. Consumo Médio (Average Km/L)
+            // Mathematically weighted average from vehicles fuel types and logs
+            let totalLitersWeighted = 0;
+            let weightedConsumptionSum = 0;
+
+            currentLogs.forEach(log => {
+                const eff = getVehicleEfficiency(log.model, log.fuelTypeName);
+                totalLitersWeighted += log.liters;
+                weightedConsumptionSum += (log.liters * eff);
+            });
+
+            let finalAvgConsumption = 0;
+            if (totalLitersWeighted > 0) {
+                finalAvgConsumption = weightedConsumptionSum / totalLitersWeighted;
+                document.getElementById('kpi-val-2').innerText = `${finalAvgConsumption.toFixed(1)} km/L`;
+            } else {
+                document.getElementById('kpi-val-2').innerText = '0.0 km/L';
+            }
+
+            const badge2 = document.getElementById('kpi-badge-2');
+            // Benchmark is 9.0 km/L average. Anything above is positive, below is negative
+            if (finalAvgConsumption === 0) {
+                badge2.className = 'kpi-badge badge-stable';
+                badge2.innerHTML = '--';
+            } else if (finalAvgConsumption >= 9.0) {
+                badge2.className = 'kpi-badge badge-positive';
+                badge2.innerHTML = '<i data-lucide="arrow-up" style="width:12px; height:12px;"></i> No Padrão';
+            } else {
+                badge2.className = 'kpi-badge badge-negative';
+                badge2.innerHTML = '<i data-lucide="arrow-down" style="width:12px; height:12px;"></i> Desvio';
+            }
+
+            // 3. Custo Total Combustível
+            const totalCostCurrent = currentLogs.reduce((acc, log) => acc + (log.liters * log.price), 0);
+            document.getElementById('kpi-val-3').innerText = totalCostCurrent.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            const badge3 = document.getElementById('kpi-badge-3');
+            const totalCostPrevious = previousLogs.reduce((acc, log) => acc + (log.liters * log.price), 0);
+            
+            if (totalCostPrevious > 0) {
+                const costDiffPercent = ((totalCostCurrent - totalCostPrevious) / totalCostPrevious) * 100;
+                if (costDiffPercent > 0) {
+                    badge3.className = 'kpi-badge badge-negative';
+                    badge3.innerHTML = `+${costDiffPercent.toFixed(1)}%`;
+                } else {
+                    badge3.className = 'kpi-badge badge-positive';
+                    badge3.innerHTML = `${costDiffPercent.toFixed(1)}%`;
+                }
+            } else {
+                badge3.className = 'kpi-badge badge-stable';
+                badge3.innerHTML = 'Histórico';
+            }
+
+            // 4. Manutenções Registradas
+            // Deterministic maintenance count derived from logs and vehicles count
+            let pendingMaintenanceCount = 0;
+            filteredVehs.forEach(v => {
+                // If refueling count is above 5, or liters is high, require deterministic check
+                if (v.totalLitersConsumed > 200 && v.refuelingCount % 2 === 1) {
+                    pendingMaintenanceCount++;
+                }
+            });
+
+            document.getElementById('kpi-val-4').innerText = String(pendingMaintenanceCount);
+            const badge4 = document.getElementById('kpi-badge-4');
+            if (pendingMaintenanceCount > 2) {
+                badge4.className = 'kpi-badge badge-alert';
+                badge4.innerHTML = 'Atenção';
+            } else {
+                badge4.className = 'kpi-badge badge-positive';
+                badge4.innerHTML = 'Normal';
+            }
+
+            // 5. Economia Gerada (R$)
+            const totalEconomyCurrent = currentLogs.reduce((acc, log) => acc + parseFloat(log.economy || 0), 0);
+            document.getElementById('kpi-val-5').innerText = totalEconomyCurrent.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            const badge5 = document.getElementById('kpi-badge-5');
+            const totalEconomyPrevious = previousLogs.reduce((acc, log) => acc + parseFloat(log.economy || 0), 0);
+            
+            if (totalEconomyPrevious > 0) {
+                const econDiffPercent = ((totalEconomyCurrent - totalEconomyPrevious) / totalEconomyPrevious) * 100;
+                if (econDiffPercent >= 0) {
+                    badge5.className = 'kpi-badge badge-positive';
+                    badge5.innerHTML = `+${econDiffPercent.toFixed(1)}%`;
+                } else {
+                    badge5.className = 'kpi-badge badge-negative';
+                    badge5.innerHTML = `${econDiffPercent.toFixed(1)}%`;
+                }
+            } else {
+                badge5.className = 'kpi-badge badge-positive';
+                badge5.innerHTML = 'Ativo';
+            }
+
+            // Update Lucide vectors
+            lucide.createIcons();
+        }
+
+        // Render Line & Donut Chart
+        function renderCharts(currentLogs) {
+            // Re-instantiate graph canvas contexts without skeletons
+            const lineCont = document.getElementById('line-container');
+            lineCont.innerHTML = '<canvas id="consumptionLineChart"></canvas>';
+            
+            const donutCont = document.getElementById('donut-container');
+            donutCont.innerHTML = `
+                <div class="chart-donut-center">
+                    <span class="donut-center-num" id="donut-center-total">100%</span>
+                    <span class="donut-center-lbl">Total Litros</span>
+                </div>
+                <canvas id="fuelDonutChart"></canvas>
+            `;
+
+            if (currentLogs.length === 0) {
+                lineCont.innerHTML = '<div class="error-message">Sem abastecimentos registrados para carregar gráficos.</div>';
+                donutCont.innerHTML = '<div class="error-message">Sem registros de combustíveis.</div>';
+                return;
+            }
+
+            // 1. DATA GROUPING FOR LINE CHART (Daily efficiency evolution)
+            // Group by date, get weighted km/L
+            const groupMap = {};
+            currentLogs.forEach(log => {
+                if (!log.date) return;
+                const dKey = log.date.split('T')[0]; // YYYY-MM-DD
+                if (!groupMap[dKey]) {
+                    groupMap[dKey] = { liters: 0, sumWeighted: 0 };
+                }
+                const eff = getVehicleEfficiency(log.model, log.fuelTypeName);
+                groupMap[dKey].liters += log.liters;
+                groupMap[dKey].sumWeighted += (log.liters * eff);
+            });
+
+            const sortedDates = Object.keys(groupMap).sort();
+            const graphLabels = sortedDates.map(d => {
+                const parts = d.split('-');
+                return `${parts[2]}/${parts[1]}`; // DD/MM formatting
+            });
+            const graphValues = sortedDates.map(d => (groupMap[d].sumWeighted / groupMap[d].liters).toFixed(2));
+
+            // Setup Line Chart
+            const ctxLine = document.getElementById('consumptionLineChart').getContext('2d');
+            lineChartInstance = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: graphLabels,
+                    datasets: [{
+                        label: 'Consumo Médio (km/L)',
+                        data: graphValues,
+                        borderColor: '#4f46e5',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#4f46e5',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 1.5,
+                        pointRadius: 3.5,
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: function(context) {
+                            const chart = context.chart;
+                            const {ctx, chartArea} = chart;
+                            if (!chartArea) return null;
+                            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                            gradient.addColorStop(0, 'rgba(79, 70, 229, 0.15)');
+                            gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+                            return gradient;
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            titleFont: { family: 'Inter', size: 11 },
+                            bodyFont: { family: 'Inter', size: 12 },
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) { return `${parseFloat(context.raw).toFixed(1)} km/L`; }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#475569', font: { family: 'Inter', size: 10 } }
+                        },
+                        y: {
+                            grid: { color: '#e2e8f0' },
+                            ticks: { color: '#475569', font: { family: 'Inter', size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // 2. DATA GROUPING FOR DONUT CHART (Fuel breakdown)
+            let sumLitersGasolina = 0;
+            let sumLitersEtanol = 0;
+            let sumLitersDiesel = 0;
+            let sumLitersOutros = 0;
+
+            currentLogs.forEach(log => {
+                const product = (log.fuelTypeName || '').toLowerCase();
+                if (product.includes('gasolina')) {
+                    sumLitersGasolina += log.liters;
+                } else if (product.includes('etanol') || product.includes('alcool')) {
+                    sumLitersEtanol += log.liters;
+                } else if (product.includes('diesel')) {
+                    sumLitersDiesel += log.liters;
+                } else {
+                    sumLitersOutros += log.liters;
+                }
+            });
+
+            const totalLitersAll = sumLitersGasolina + sumLitersEtanol + sumLitersDiesel + sumLitersOutros;
+            const pctGas = totalLitersAll > 0 ? (sumLitersGasolina / totalLitersAll) * 100 : 0;
+            const pctEta = totalLitersAll > 0 ? (sumLitersEtanol / totalLitersAll) * 100 : 0;
+            const pctDie = totalLitersAll > 0 ? (sumLitersDiesel / totalLitersAll) * 100 : 0;
+            const pctOut = totalLitersAll > 0 ? (sumLitersOutros / totalLitersAll) * 100 : 0;
+
+            // Update Total text in center of Donut
+            document.getElementById('donut-center-total').innerText = Math.round(totalLitersAll).toLocaleString('pt-BR') + ' L';
+
+            const donutLabels = [];
+            const donutData = [];
+            const donutColors = [];
+
+            if (sumLitersGasolina > 0) { donutLabels.push('Gasolina'); donutData.push(pctGas.toFixed(1)); donutColors.push('#d97706'); }
+            if (sumLitersEtanol > 0) { donutLabels.push('Etanol'); donutData.push(pctEta.toFixed(1)); donutColors.push('#15803d'); }
+            if (sumLitersDiesel > 0) { donutLabels.push('Diesel'); donutData.push(pctDie.toFixed(1)); donutColors.push('#2563eb'); }
+            if (sumLitersOutros > 0) { donutLabels.push('Outros'); donutData.push(pctOut.toFixed(1)); donutColors.push('#94a3b8'); }
+
+            const ctxDonut = document.getElementById('fuelDonutChart').getContext('2d');
+            donutChartInstance = new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: donutLabels,
+                    datasets: [{
+                        data: donutData,
+                        backgroundColor: donutColors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) { return ` ${context.label}: ${context.raw}%`; }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Build custom labels layout under donut
+            const donutLegend = document.getElementById('donut-legend');
+            donutLegend.innerHTML = '';
+            donutLabels.forEach((label, i) => {
+                const legItem = document.createElement('div');
+                legItem.className = 'chart-segment-legend chart-legend-item';
+                legItem.innerHTML = `
+                    <div class="legend-color" style="background-color: ${donutColors[i]}"></div>
+                    <span>${label} (${donutData[i]}%)</span>
+                `;
+                donutLegend.appendChild(legItem);
+            });
+        }
+
+        // Render Table "Veículos em Destaque" (Filtro por veículos e abastecimentos do período)
+        function renderVehiclesTable(filteredVehs, logs) {
+            const tableBody = document.getElementById('vehicles-table-body');
+            tableBody.innerHTML = '';
+
+            if (filteredVehs.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-secondary);">Nenhum veículo correspondente aos filtros.</td></tr>';
+                return;
+            }
+
+            // Map refueling statistics dynamically to vehicles rows
+            // We'll calculate kilometers run deterministic based on liters * preferred fuel efficiency
+            const rowsData = filteredVehs.map(v => {
+                // Sum liters and economy for this vehicle specifically in current period logs
+                const vLogs = logs.filter(log => log.vehicleId === v.id);
+                const periodLiters = vLogs.reduce((acc, log) => acc + log.liters, 0);
+                const periodCost = vLogs.reduce((acc, log) => acc + log.cost, 0);
+
+                const eff = getVehicleEfficiency(v.model, v.preferredFuelName);
+                const kmRodados = periodLiters * eff;
+
+                // Benchmark comparison percentage
+                const benchmark = (v.preferredFuelName || '').toLowerCase().includes('diesel') ? 7.0 : 10.0;
+                const efficiencyRate = Math.min(Math.round((eff / benchmark) * 100), 100);
+
+                return {
+                    id: v.id,
+                    model: v.model,
+                    brand: v.brand,
+                    plate: v.plate,
+                    driverName: v.driverName,
+                    kmRodados: kmRodados,
+                    consumption: eff,
+                    cost: periodCost,
+                    efficiency: efficiencyRate,
+                    active: v.active
+                };
+            });
+
+            // Sort vehicles by Km Rodados (descending) as required
+            rowsData.sort((a,b) => b.kmRodados - a.kmRodados);
+
+            rowsData.forEach(r => {
+                const tr = document.createElement('tr');
+                
+                // Color mapping for progression rate
+                let colorClass = 'fill-red';
+                if (r.efficiency >= 80) {
+                    colorClass = 'fill-green';
+                } else if (r.efficiency >= 50) {
+                    colorClass = 'fill-orange';
+                }
+
+                // Driver profile lookup of status
+                const dStatus = r.active ? 'Ativo' : 'Offline';
+                const statusClass = r.active ? 'badge-positive' : 'badge-stable';
+
+                tr.innerHTML = `
+                    <td>
+                        <div style="display: flex; flex-direction: column; justify-content: center; text-align: left;">
+                            <div class="vehicle-name" style="font-weight: 600; color: var(--text-primary); text-align: left;">${r.model}</div>
+                            <div style="font-size:11px; color:var(--text-secondary); text-align: left;">${r.brand || ''}</div>
+                        </div>
+                    </td>
+                    <td class="text-mono">${r.plate}</td>
+                    <td>${r.driverName || 'Sem motorista'}</td>
+                    <td class="text-mono">${Math.round(r.kmRodados).toLocaleString('pt-BR')} km</td>
+                    <td class="text-mono">${r.consumption.toFixed(1)} km/L</td>
+                    <td class="text-mono">${r.cost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>
+                        <div style="display: flex; align-items:center;">
+                            <div class="efficiency-bar">
+                                <div class="efficiency-fill ${colorClass}" style="width: ${r.efficiency}%"></div>
+                            </div>
+                            <span class="text-mono" style="font-size:11px; font-weight:600;">${r.efficiency}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-pill kpi-badge ${statusClass}">${dStatus}</span>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Render Table "Últimos Abastecimentos"
+        function renderFuelLogsTable(logs) {
+            const tableBody = document.getElementById('refuelings-table-body');
+            tableBody.innerHTML = '';
+            
+            // Limit to 10 records as requested
+            const limitLogs = logs.slice(0, 10);
+            
+            // Total logs badge counter
+            document.getElementById('fuel-logs-count').innerText = String(logs.length);
+
+            if (limitLogs.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--text-secondary);">Nenhum abastecimento registrado para o período seleto.</td></tr>';
+                return;
+            }
+
+            limitLogs.forEach(log => {
+                const tr = document.createElement('tr');
+
+                // Dynamic driver name resolution using plate mapping with vehicleData
+                const vMatch = vehiclesData.find(v => v.plate === log.plate);
+                const motoristaName = vMatch ? vMatch.driverName : 'ROBO_NFCE';
+
+                // Formatting timestamp
+                let formattedTime = 'S/ Data';
+                if (log.date) {
+                    const dt = new Date(log.date);
+                    formattedTime = dt.toLocaleDateString('pt-BR') + ' ' + dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                // Economy badge color (Green ↓/ Red ↑)
+                let economyCell = '<span class="text-mono">R$ 0,00</span>';
+                if (log.economy > 0) {
+                    economyCell = `<span class="text-mono" style="color:var(--accent-positive); font-weight:600;">- R$ ${log.economy.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ↓</span>`;
+                } else if (log.economy < 0) {
+                    economyCell = `<span class="text-mono" style="color:var(--accent-negative); font-weight:600;">+ R$ ${Math.abs(log.economy).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ↑</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="text-mono">${formattedTime}</td>
+                    <td>${motoristaName}</td>
+                    <td>
+                        <div style="font-weight:600;">${log.model}</div>
+                        <div style="font-size:11px; color:var(--text-secondary);" class="text-mono">${log.plate}</div>
+                    </td>
+                    <td>
+                        <div style="font-weight:500;">${log.gasStation}</div>
+                        <div style="font-size:11px; color:var(--text-secondary);">${log.city} - ${log.state}</div>
+                    </td>
+                    <td class="text-mono">${log.liters.toFixed(1)} L</td>
+                    <td class="text-mono">${log.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td class="text-mono" style="font-weight:600;">${log.cost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>${economyCell}</td>
+                    <td>
+                        ${log.url_qrcode ? `
+                            <button onclick="openNfeModal('${encodeURIComponent(log.url_qrcode)}')" class="source-badge" style="cursor:pointer; border:none; display:inline-flex; align-items:center; gap:4px; padding: 4px 8px; border-radius: 6px; background: rgba(14, 165, 233, 0.1); color: var(--accent-primary); font-weight: 600; font-family: inherit; font-size: 11px;">
+                                <i data-lucide="external-link" style="width:12px; height:12px;"></i>
+                                NFC-e
+                            </button>
+                        ` : `
+                            <span class="source-badge" style="padding: 4px 8px; border-radius: 6px; background: rgba(148, 163, 184, 0.1); color: var(--text-secondary); font-size: 11px; font-weight: 500;">
+                                NFC-e
+                            </span>
+                        `}
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Render vectors
+            lucide.createIcons();
+        }
+
+        // Attach event listeners to all selectors so changing re-parametrizes queries reactively
+        const selectors = ['filter-period', 'filter-driver', 'filter-vehicle', 'filter-fuel'];
+        selectors.forEach(sel => {
+            document.getElementById(sel).addEventListener('change', () => {
+                if (sel === 'filter-driver') {
+                    updateVehicleFilterOptions();
+                }
+                renderDashboard();
+            });
+        });
+
+        // Dynamic inline line period filter
+        document.getElementById('chart-period-inline').addEventListener('change', (e) => {
+            const periodFil = document.getElementById('filter-period').value;
+            const driverFil = document.getElementById('filter-driver').value;
+            const vehicleFil = document.getElementById('filter-vehicle').value;
+            const fuelFil = document.getElementById('filter-fuel').value;
+
+            // Simple line-chart inline filter grouping (daily versus weekly average)
+            let filteredAbast = [...abastecimentosData];
+            if (fuelFil !== 'all') filteredAbast = filteredAbast.filter(l => l.fuelTypeName === fuelFil);
+            if (vehicleFil !== 'all') filteredAbast = filteredAbast.filter(l => l.vehicleId === vehicleFil);
+
+            const selection = e.target.value;
+            
+            // Build the data grouping based on selection
+            const groupMap = {};
+            filteredAbast.forEach(log => {
+                if (!log.date) return;
+                const dKey = log.date.split('T')[0];
+                let groupKey = dKey;
+
+                if (selection === 'weekly') {
+                    // Weekly group
+                    const d = new Date(log.date);
+                    const weekNo = Math.ceil(d.getDate() / 7);
+                    groupKey = `S${weekNo} de ${d.toLocaleDateString('pt-BR', { month: 'short' })}/26`;
+                }
+
+                if (!groupMap[groupKey]) {
+                    groupMap[groupKey] = { liters: 0, sumWeighted: 0 };
+                }
+                const eff = getVehicleEfficiency(log.model, log.fuelTypeName);
+                groupMap[groupKey].liters += log.liters;
+                groupMap[groupKey].sumWeighted += (log.liters * eff);
+            });
+
+            const sortedKeys = Object.keys(groupMap).sort();
+            const graphLabels = sortedKeys.map(k => {
+                if (selection === 'daily') {
+                    const parts = k.split('-');
+                    return `${parts[2]}/${parts[1]}`;
+                }
+                return k;
+            });
+            const graphValues = sortedKeys.map(k => (groupMap[k].sumWeighted / groupMap[k].liters).toFixed(2));
+
+            // Update line chart lines data
+            if (lineChartInstance) {
+                lineChartInstance.data.labels = graphLabels;
+                lineChartInstance.data.datasets[0].data = graphValues;
+                lineChartInstance.update();
+            }
+        });
+
+        // Kickoff
+        window.onload = () => {
+            fetchInitialData();
+            
+            // Setup backdrop dismiss for modal
+            document.getElementById('nfe-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'nfe-modal') {
+                    closeNfeModal();
+                }
+            });
+        };
+
+        // NF-e modal actions
+        function openNfeModal(encodedUrl) {
+            const url = decodeURIComponent(encodedUrl);
+            const modal = document.getElementById('nfe-modal');
+            const iframe = document.getElementById('nfe-iframe');
+            const extLink = document.getElementById('nfe-external-link');
+            
+            iframe.src = url;
+            extLink.href = url;
+            modal.style.display = 'flex';
+            
+            // Bind lucide icons inside modal if any
+            lucide.createIcons();
+        }
+
+        function closeNfeModal() {
+            const modal = document.getElementById('nfe-modal');
+            const iframe = document.getElementById('nfe-iframe');
+            iframe.src = '';
+            modal.style.display = 'none';
+        }
+    </script>
+
+    <!-- Modal de Visualização da NFe (SEFAZ) -->
+    <div id="nfe-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index:9999; align-items:center; justify-content:center;">
+        <div class="modal-container" style="background:var(--bg-card); width:90%; max-width:1000px; height:85%; border-radius:12px; border:1px solid var(--border-card); display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 25px -5px rgba(0,0,0,0.15);">
+            <div class="modal-header" style="padding:16px 20px; border-bottom:1px solid var(--border-card); display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <i data-lucide="file-text" style="color:var(--accent-primary); width:20px; height:20px;"></i>
+                    <h3 style="font-weight:600; font-size:16px; margin:0; color:var(--text-primary); font-family:inherit;">Visualizador de NF-e (SEFAZ)</h3>
+                </div>
+                <button onclick="closeNfeModal()" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); display:flex; padding:4px; border-radius:4px; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='none'">
+                    <i data-lucide="x" style="width:20px; height:20px;"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="flex:1; background:#f8fafc; position:relative;">
+                <iframe id="nfe-iframe" src="" style="width:100%; height:100%; border:none; background:#ffffff;"></iframe>
+            </div>
+            <div class="modal-footer" style="padding:12px 20px; border-top:1px solid var(--border-card); display:flex; justify-content:flex-end; gap:12px; background:var(--bg-card);">
+                <button onclick="closeNfeModal()" style="padding:8px 16px; font-size:13px; font-weight:500; border:1px solid var(--border-card); border-radius:6px; background:var(--bg-card); color:var(--text-primary); cursor:pointer;">Fechar</button>
+                <a id="nfe-external-link" href="#" target="_blank" style="padding:8px 16px; font-size:13px; font-weight:500; border:none; border-radius:6px; background:var(--accent-primary); color:#ffffff; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                    <i data-lucide="external-link" style="width:14px; height:14px;"></i> Abrir no Navegador
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

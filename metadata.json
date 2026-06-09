@@ -1,0 +1,6 @@
+{
+  "name": "Enche o Tanque",
+  "description": "Scanner de notas fiscais para economia de combustível.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Exceções e Segurança - Enche o Tanque</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #f0f2f5;
+        }
+        .container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-top: 8px solid #ef4444;
+        }
+        h1 { color: #b91c1c; text-align: center; font-size: 2.2em; margin-bottom: 30px; }
+        h2 { color: #1e3a8a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 40px; }
+        .solution-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin: 30px 0;
+        }
+        .card {
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+        }
+        .card-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .color-A { border-left: 6px solid #3b82f6; }
+        .color-B { border-left: 6px solid #10b981; }
+        
+        .exception-box {
+            background-color: #fff1f2;
+            border: 1px solid #fecdd3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .tag-transfer { background-color: #3b82f6; }
+        .tag-theft { background-color: #ef4444; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #e2e8f0; text-align: left; }
+        th { background: #f1f5f9; }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .alert-info { background-color: #e0f2fe; border: 1px solid #7dd3fc; color: #0369a1; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+<div class="brand-header-nav" style="background: #000000; border: 1px solid #1f2937; border-bottom: 3px solid #ccff00; padding: 15px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; border-radius: 12px; margin-bottom: 30px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.15); max-width: 100%; box-sizing: border-box; color: #f8fafc; text-align: left;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="/Logo_maker_project.png" alt="Logo Enche o Tanque" style="width: 48px; height: 48px; object-fit: contain;" referrerpolicy="no-referrer">
+        <div>
+            <div style="font-size: 1.15rem; font-weight: 800; tracking: tight; color: #ffffff; line-height: 1.2;">ENCHE O <span style="color: #ccff00;">TANQUE</span></div>
+            <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; line-height: 1.2;">Ecossistema Inteligente de Combustíveis</div>
+        </div>
+    </div>
+    <nav style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <a href="https://app.encheotanque.net.br" style="font-size: 0.8rem; font-weight: 700; color: #ccff00; text-decoration: none; padding: 5px 12px; border: 1px solid rgba(204, 255, 0, 0.4); border-radius: 6px; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.background='rgba(204,255,0,0.15)'" onmouseout="this.style.background='transparent'">IR PARA O APP ➔</a>
+        <a href="./RELATORIO_PROJETO.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Relatório</a>
+        <a href="./Relatorio_Atividades_Semestre.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Atividades</a>
+        <a href="./doc.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Escopo</a>
+        <a href="./Analise_Concorrencia.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Concorrência</a>
+        <a href="./Analise_Expansao_Rede.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Expansão</a>
+        <a href="./Gestao_Seguranca_Veiculos.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Segurança</a>
+        <a href="./Status_Arquitetura.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Arquitetura</a>
+        <a href="./BUSINESS_RULES.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Regras</a>
+        <a href="./backlog.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Roadmap</a>
+        <a href="./apresentacao_radar.html" style="font-size: 0.78rem; font-weight: 700; color: #ccff00; text-decoration: none; padding: 4px 8px; background: rgba(204, 255, 0, 0.1); border: 1px solid rgba(204, 255, 0, 0.3); border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ffffff'; this.style.background='rgba(204,255,0,0.2)'" onmouseout="this.style.color='#ccff00'; this.style.background='rgba(204,255,0,0.1)'">📺 Apresentação</a>
+        <a href="./mapa-implantacao-sudeste.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Sudeste</a>
+    </nav>
+</div>
+<h1>🛡️ Protocolos de Exceção: Ouro & Segurança</h1>
+        <p style="text-align: center; color: #64748b; font-size: 1.1em;">
+            Estratégias para Transferência de Propriedade, Venda de Veículos e Reação a Roubos.
+        </p>
+
+        <div class="alert alert-info">
+            <strong>💡 Insight Central:</strong> A "Placa" é o identificador visual (MX), mas o <strong>RENAVAM</strong> e o <strong>Vínculo de CPF</strong> são as âncoras jurídicas que evitam fraudes e duplicidade de contas.
+        </div>
+
+        <h2>⚖️ Cenário 1: Transferência de Veículo (Venda)</h2>
+        <p>O maior problema de apps de frotas é o "veículo fantasma" preso na conta do antigo motorista. Precisamos de um mecanismo de <strong>Dissociação Automática por Prova de Documento</strong>.</p>
+
+        <div class="solution-grid">
+            <div class="card color-A">
+                <div class="card-title">🚀 Solução A: "Chave do CRV/Digital"</div>
+                <p><strong>Lógica:</strong> Ao tentar cadastrar uma placa já existente, o App solicita os 4 últimos dígitos do código de segurança do CRV (documento de venda) ou o número do RENAVAM.</p>
+                <ul>
+                    <li><strong>Vantagem:</strong> Se o novo dono tem o documento em mãos, ele descadastra o antigo motorista instantaneamente.</li>
+                    <li><strong>Anti-Fraude:</strong> Apenas o possuidor físico/legal do veículo consegue essa informação.</li>
+                </ul>
+            </div>
+            <div class="card color-B">
+                <div class="card-title">📬 Solução B: "Quarentena & Notificação"</div>
+                <p><strong>Lógica:</strong> O novo usuário solicita a posse. O antigo recebe um Push/Email: <em>"Alguém está reivindicando esta placa. Se você vendeu, confirme em 24h. Se não, cancele."</em></p>
+                <ul>
+                    <li><strong>Vantagem:</strong> UX amigável e menos burocrática.</li>
+                    <li><strong>Risco:</strong> Se o antigo dono sumir, o veículo fica travado até intervenção do suporte.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>🚨 Cenário 2: Roubo e Recuperação</h2>
+        <p>Em caso de roubo, o veículo se torna uma arma de fraude (podendo ser usado para "lavar" notas fiscais de abastecimento ou qrcodes falsos).</p>
+        
+        <div class="exception-box">
+            <span class="tag tag-theft">ESTADO: ROUBADO</span>
+            <h3>Fluxo de Suspensão de Emergência</h3>
+            <ul>
+                <li><strong>Bloqueio Imediato:</strong> Motorista ou Empresa marca o veículo como <code>STATUS = 'ROUBADO'</code> no dashboard.</li>
+                <li><strong>Efeito:</strong> O App nega qualquer captura de QRCode para essa placa. O login do motorista associado pode ser suspenso se o celular também foi levado.</li>
+                <li><strong>Reativação:</strong> Só permitida via "Upload de Boletim de Ocorrência de Recuperação" (B2C) ou validação de Token Master do Gestor de Frota (B2B).</li>
+            </ul>
+        </div>
+
+        <h2>📋 Matriz de Estados do Veículo</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Estado</th>
+                    <th>Ação do Sistema</th>
+                    <th>Motivo Comum</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Ativo</strong></td>
+                    <td>Uso total liberado.</td>
+                    <td>Operação normal.</td>
+                </tr>
+                <tr>
+                    <td><strong>Em Disputa</strong></td>
+                    <td>Captura liberada para o NOVO, mas sinalizada para auditoria.</td>
+                    <td>Novo dono cadastrou, mas antigo não removeu.</td>
+                </tr>
+                <tr>
+                    <td><strong>Suspenso</strong></td>
+                    <td>App abre, mas QRCode bloqueado.</td>
+                    <td>Inadimplência da Frota (B2B) ou CNH vencida.</td>
+                </tr>
+                <tr>
+                    <td><strong>Bloqueado (Fatal)</strong></td>
+                    <td>App trava na tela de aviso.</td>
+                    <td>Veículo Roubado ou Fraude detectada.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>🧠 Recomendação Técnica (Backend)</h2>
+        <p>Para evitar contas duplicadas e facilitar a vida do usuário, a base deve seguir esta hierarquia:</p>
+        <ol>
+            <li><strong>Login (Email/Google):</strong> É o cidadão.</li>
+            <li><strong>Perfil (CPF):</strong> É a identidade única do Motorista.</li>
+            <li><strong>Vínculo (Motorista <-> Placa):</strong> Relacionamento 1 para N. Um motorista pode ter vários carros, mas uma placa só pode estar ATIVA em um motorista por vez.</li>
+        </ol>
+        
+        <p style="background: #f1f5f9; padding: 15px; border-radius: 8px; border-left: 4px solid #1e3a8a;">
+            <strong>Mecânica de "Kick":</strong> Quando o motorista B cadastra a Placa X com sucesso (provando posse), o sistema automaticamente altera o registro do motorista A para <code>fl_ativo = 0</code> e registra a data da transferência para fins de histórico.
+        </p>
+
+        <div style="text-align: center; margin-top: 50px; color: #94a3b8; font-size: 0.9em;">
+            &copy; 2026 Equipe Enche o Tanque - Documento de Arquitetura de Segurança de Dados
+        </div>
+    </div>
+
+</body>
+</html>

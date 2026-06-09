@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regras de Negócio - Fuel Community</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0c0c0c;
+            color: #e5e5e5;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .highlight-green { color: #ccff00; }
+        .bg-green-glow { background: rgba(204, 255, 0, 0.1); border: 1px solid rgba(204, 255, 0, 0.2); }
+        .bg-blue-glow { background: rgba(0, 204, 255, 0.1); border: 1px solid rgba(0, 204, 255, 0.2); }
+        .bg-purple-glow { background: rgba(157, 0, 255, 0.1); border: 1px solid rgba(157, 0, 255, 0.2); }
+        .bg-amber-glow { background: rgba(255, 191, 0, 0.1); border: 1px solid rgba(255, 191, 0, 0.2); }
+    </style>
+</head>
+<body class="p-6 md:p-12 lg:p-24">
+<div class="brand-header-nav" style="background: #000000; border: 1px solid #1f2937; border-bottom: 3px solid #ccff00; padding: 15px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; border-radius: 12px; margin-bottom: 30px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.15); max-width: 100%; box-sizing: border-box; color: #f8fafc; text-align: left;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="/Logo_maker_project.png" alt="Logo Enche o Tanque" style="width: 48px; height: 48px; object-fit: contain;" referrerpolicy="no-referrer">
+        <div>
+            <div style="font-size: 1.15rem; font-weight: 800; tracking: tight; color: #ffffff; line-height: 1.2;">ENCHE O <span style="color: #ccff00;">TANQUE</span></div>
+            <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; line-height: 1.2;">Ecossistema Inteligente de Combustíveis</div>
+        </div>
+    </div>
+    <nav style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <a href="https://app.encheotanque.net.br" style="font-size: 0.8rem; font-weight: 700; color: #ccff00; text-decoration: none; padding: 5px 12px; border: 1px solid rgba(204, 255, 0, 0.4); border-radius: 6px; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.background='rgba(204,255,0,0.15)'" onmouseout="this.style.background='transparent'">IR PARA O APP ➔</a>
+        <a href="./RELATORIO_PROJETO.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Relatório</a>
+        <a href="./Relatorio_Atividades_Semestre.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Atividades</a>
+        <a href="./doc.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Escopo</a>
+        <a href="./Analise_Concorrencia.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Concorrência</a>
+        <a href="./Analise_Expansao_Rede.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Expansão</a>
+        <a href="./Gestao_Seguranca_Veiculos.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Segurança</a>
+        <a href="./Status_Arquitetura.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Arquitetura</a>
+        <a href="./BUSINESS_RULES.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Regras</a>
+        <a href="./backlog.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Roadmap</a>
+        <a href="./apresentacao_radar.html" style="font-size: 0.78rem; font-weight: 700; color: #ccff00; text-decoration: none; padding: 4px 8px; background: rgba(204, 255, 0, 0.1); border: 1px solid rgba(204, 255, 0, 0.3); border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ffffff'; this.style.background='rgba(204,255,0,0.2)'" onmouseout="this.style.color='#ccff00'; this.style.background='rgba(204,255,0,0.1)'">📺 Apresentação</a>
+        <a href="./mapa-implantacao-sudeste.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Sudeste</a>
+    </nav>
+</div>
+<h1 class="text-5xl md:text-7xl font-black tracking-tighter text-white mb-6 uppercase italic">
+                Regras de <span class="highlight-green">Negócio</span>
+            </h1>
+            <p class="text-lg text-gray-400 max-w-2xl leading-relaxed">
+                Este guia define os pilares de funcionamento do ecossistema <strong>Fuel Community</strong>, focando em colaboração, segurança e transparência de dados.
+            </p>
+        </header>
+
+        <div class="grid gap-8">
+            <!-- Section 1: Give-to-Get -->
+            <section class="glass-card rounded-[2rem] p-8 md:p-10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-green-glow flex items-center justify-center text-2xl">🤝</div>
+                    <h2 class="text-2xl font-extrabold text-white uppercase tracking-tight">1. O Conceito "Give-to-Get"</h2>
+                </div>
+                <div class="space-y-6 text-gray-400 leading-relaxed">
+                    <p>O aplicativo opera sob um modelo de <strong>Colaboração Ativa</strong>. Para consumir os dados de preços, o motorista precisa obrigatoriamente alimentar a base.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-6 rounded-2xl bg-white/5 border border-white/10">
+                            <h3 class="text-[#ccff00] font-bold mb-2 uppercase text-sm">Regra dos 7 Dias</h3>
+                            <p class="text-sm">O acesso à busca de preços é liberado por 168 horas (7 dias) após cada captura válida de QR Code de nota fiscal de abastecimento.</p>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-white/5 border border-white/10">
+                            <h3 class="text-[#ccff00] font-bold mb-2 uppercase text-sm">Privilégio de Onboarding</h3>
+                            <p class="text-sm">Novos usuários recebem um "salvo-conduto" de <strong>24 horas</strong> de acesso total para conhecer o sistema antes da primeira trava.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Captura e Dados -->
+            <section class="glass-card rounded-[2rem] p-8 md:p-10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-glow flex items-center justify-center text-2xl">📸</div>
+                    <h2 class="text-2xl font-extrabold text-white uppercase tracking-tight text-[#00ccff]">2. Captura & Validação</h2>
+                </div>
+                <ul class="space-y-4">
+                    <li class="flex gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors">
+                        <span class="text-[#00ccff] font-bold">2.1.</span>
+                        <p class="text-gray-400"><strong class="text-white">Unicidade:</strong> Cada nota fiscal (URL do QR Code) é única. O sistema bloqueia duplicatadas para evitar inflar artificialmente a economia do usuário.</p>
+                    </li>
+                    <li class="flex gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors">
+                        <span class="text-[#00ccff] font-bold">2.2.</span>
+                        <p class="text-gray-400"><strong class="text-white">Vínculo de Veículo:</strong> A captura deve estar associada a um veículo do motorista para validação do tipo de combustível e autonomia.</p>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Section 3: Busca e Inteligência -->
+            <section class="glass-card rounded-[2rem] p-8 md:p-10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-glow flex items-center justify-center text-2xl">📡</div>
+                    <h2 class="text-2xl font-extrabold text-white uppercase tracking-tight text-[#9d00ff]">3. Busca Inteligente</h2>
+                </div>
+                <div class="bg-purple-glow p-6 rounded-2xl border-none mb-6">
+                    <p class="text-sm text-gray-300">A busca utiliza <strong>Geolocalização em tempo real</strong>. O raio padrão de consulta é dinâmico, priorizando postos em um raio de até 50km da localização GPS enviada pelo dispositivo.</p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <span class="px-4 py-2 rounded-lg bg-white/5 text-xs font-bold border border-white/10 uppercase">Filtro de Frescor (72h)</span>
+                    <span class="px-4 py-2 rounded-lg bg-white/5 text-xs font-bold border border-white/10 uppercase">Ordenação por Preço</span>
+                    <span class="px-4 py-2 rounded-lg bg-white/5 text-xs font-bold border border-white/10 uppercase">Mapeamento Georreferenciado</span>
+                </div>
+            </section>
+
+            <!-- Section 4: Motoristas -->
+            <section class="glass-card rounded-[2rem] p-8 md:p-10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-glow flex items-center justify-center text-2xl">👤</div>
+                    <h2 class="text-2xl font-extrabold text-white uppercase tracking-tight text-[#ffbf00]">4. Compliance do Motorista</h2>
+                </div>
+                <p class="text-gray-400 mb-6">Para manter a integridade da rede, o motorista deve manter seus dados atualizados:</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center p-4 rounded-xl bg-white/5 border border-white/10">
+                        <div class="text-[10px] text-gray-500 font-black uppercase mb-1">Doc. Identidade</div>
+                        <div class="text-white font-bold">CPF Ativo</div>
+                    </div>
+                    <div class="text-center p-4 rounded-xl bg-white/5 border border-white/10">
+                        <div class="text-[10px] text-gray-500 font-black uppercase mb-1">Qualificação</div>
+                        <div class="text-white font-bold">CNH Válida</div>
+                    </div>
+                    <div class="text-center p-4 rounded-xl bg-white/5 border border-white/10">
+                        <div class="text-[10px] text-gray-500 font-black uppercase mb-1">Verificação</div>
+                        <div class="text-white font-bold">E-mail OK</div>
+                    </div>
+                    <div class="text-center p-4 rounded-xl bg-white/5 border border-white/10">
+                        <div class="text-[10px] text-gray-500 font-black uppercase mb-1">Cadastro</div>
+                        <div class="text-white font-bold">Data/Hora</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Cartel -->
+            <section class="border-2 border-dashed border-white/10 rounded-[2rem] p-8 md:p-10 overflow-hidden relative">
+                <div class="absolute -right-4 -top-4 opacity-10 rotate-12 scale-150 text-9xl italic font-black">PROJETADO</div>
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-2xl">⚖️</div>
+                    <h2 class="text-2xl font-extrabold text-white uppercase tracking-tight opacity-50">5. Monitoramento Anti-Cartel</h2>
+                </div>
+                <p class="text-gray-500 italic">
+                    Em desenvolvimento: Algoritmos de correlação estatística para identificar padrões de preços idênticos em áreas contíguas entre postos de bandeiras distintas.
+                </p>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-24 pt-8 border-t border-white/5 text-center text-gray-600 text-sm italic">
+            Documento de Referência Versão 1.0.2 - Fuel Community App &copy; 2026
+        </footer>
+    </div>
+</body>
+</html>

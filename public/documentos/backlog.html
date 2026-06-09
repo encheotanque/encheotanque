@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backlog Comercial & Roadmap do Produto - Enche o Tanque</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#0a0f1d',
+                            slate: '#0f172a',
+                            nav: '#111827',
+                            lime: '#ccff00',
+                            green: '#22c55e',
+                            muted: '#94a3b8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0f1d;
+            background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, #0a0f1d 70%);
+            background-attachment: fixed;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ccff00;
+        }
+    </style>
+</head>
+<body class="text-slate-100 font-sans min-h-screen">
+<div class="brand-header-nav" style="background: #000000; border: 1px solid #1f2937; border-bottom: 3px solid #ccff00; padding: 15px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; border-radius: 12px; margin-bottom: 30px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.15); max-width: 100%; box-sizing: border-box; color: #f8fafc; text-align: left;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="/Logo_maker_project.png" alt="Logo Enche o Tanque" style="width: 48px; height: 48px; object-fit: contain;" referrerpolicy="no-referrer">
+        <div>
+            <div style="font-size: 1.15rem; font-weight: 800; tracking: tight; color: #ffffff; line-height: 1.2;">ENCHE O <span style="color: #ccff00;">TANQUE</span></div>
+            <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; line-height: 1.2;">Ecossistema Inteligente de Combustíveis</div>
+        </div>
+    </div>
+    <nav style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <a href="https://app.encheotanque.net.br" style="font-size: 0.8rem; font-weight: 700; color: #ccff00; text-decoration: none; padding: 5px 12px; border: 1px solid rgba(204, 255, 0, 0.4); border-radius: 6px; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.background='rgba(204,255,0,0.15)'" onmouseout="this.style.background='transparent'">IR PARA O APP ➔</a>
+        <a href="./RELATORIO_PROJETO.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Relatório</a>
+        <a href="./Relatorio_Atividades_Semestre.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Atividades</a>
+        <a href="./doc.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Escopo</a>
+        <a href="./Analise_Concorrencia.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Concorrência</a>
+        <a href="./Analise_Expansao_Rede.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Expansão</a>
+        <a href="./Gestao_Seguranca_Veiculos.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Segurança</a>
+        <a href="./Status_Arquitetura.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Arquitetura</a>
+        <a href="./BUSINESS_RULES.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Regras</a>
+        <a href="./backlog.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Roadmap</a>
+        <a href="./apresentacao_radar.html" style="font-size: 0.78rem; font-weight: 700; color: #ccff00; text-decoration: none; padding: 4px 8px; background: rgba(204, 255, 0, 0.1); border: 1px solid rgba(204, 255, 0, 0.3); border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ffffff'; this.style.background='rgba(204,255,0,0.2)'" onmouseout="this.style.color='#ccff00'; this.style.background='rgba(204,255,0,0.1)'">📺 Apresentação</a>
+        <a href="./mapa-implantacao-sudeste.html" style="font-size: 0.78rem; font-weight: 600; color: #e2e8f0; text-decoration: none; padding: 5px 8px; border-radius: 4px; transition: color 0.15s; white-space: nowrap;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#e2e8f0'">Sudeste</a>
+    </nav>
+</div>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Banner Intro / Mission Card -->
+        <div class="relative bg-slate-900/60 rounded-3xl p-6 sm:p-8 border border-slate-800/80 mb-8 overflow-hidden shadow-2xl">
+            <div class="absolute right-0 top-0 w-96 h-96 bg-brand-lime/5 rounded-full blur-[100px] pointer-events-none"></div>
+            <div class="absolute -left-10 -bottom-10 w-96 h-96 bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+            
+            <div class="relative z-10 max-w-4xl">
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-lime uppercase tracking-wider bg-brand-lime/10 px-3 py-1 rounded-full mb-3 border border-brand-lime/20">
+                    🏁 Extensão PAE III: Ciência de Dados & BI
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+                    Do Protótipo de Ciência de Dados & BI ao Negócio de Alta Escala
+                </h2>
+                <p class="mt-2 text-slate-300 text-sm sm:text-base leading-relaxed">
+                    Este backlog foi elaborado para embasar os próximos meses de desenvolvimento do <strong>Enche o Tanque</strong>. O foco principal é otimizar a experiência do motorista profissional (Uber, 99, frotistas e entregadores), combater fraudes, assegurar parcerias lucrativas com postos de combustíveis e maximizar a eficiência das operações administrativas.
+                </p>
+            </div>
+        </div>
+
+        <!-- High-Level KPI Summary Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg">
+                <span class="text-xs font-semibold text-brand-muted uppercase tracking-wider block mb-1">Total de Features</span>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-extrabold text-white font-mono">18</span>
+                    <span class="text-xs text-brand-lime font-medium">Mapeadas</span>
+                </div>
+            </div>
+            <div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg">
+                <span class="text-xs font-semibold text-brand-muted uppercase tracking-wider block mb-1">Alta Prioridade [Crítica]</span>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-extrabold text-brand-lime font-mono">7</span>
+                    <span class="text-xs text-brand-lime/80 font-medium">Fase 1 (Mês 1)</span>
+                </div>
+            </div>
+            <div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg">
+                <span class="text-xs font-semibold text-brand-muted uppercase tracking-wider block mb-1">Média Prioridade [Gera Valor]</span>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-extrabold text-yellow-400 font-mono">7</span>
+                    <span class="text-xs text-yellow-400/80 font-medium font-mono">Q3/Q4 2026</span>
+                </div>
+            </div>
+            <div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-lg">
+                <span class="text-xs font-semibold text-brand-muted uppercase tracking-wider block mb-1">Valor do Segmento B2B</span>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-extrabold text-emerald-400 font-mono">R$ 0</span>
+                    <span class="text-xs text-emerald-400 font-medium">Custo Zero Inicial</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Toolbar (Filters and Search) -->
+        <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 sm:p-6 mb-8 flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center shadow-xl">
+            <!-- Search block -->
+            <div class="relative flex-1 max-w-lg">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                    <svg class="h-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </span>
+                <input type="text" id="searchInput" oninput="filterBacklog()"
+                       placeholder="Buscar por termo (Ex: SEFAZ, UX, Premium, Chat...)"
+                       class="w-full bg-brand-black/80 text-white placeholder-slate-500 pl-11 pr-4 py-2.5 rounded-xl border border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-brand-lime/50 focus:border-brand-lime transition duration-200">
+            </div>
+
+            <!-- Categories Buttons Slider -->
+            <div class="flex flex-wrap items-center gap-2" id="familyFilters">
+                <button onclick="setCategory('ALL')" id="btn-all" class="category-btn active px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 bg-brand-lime text-brand-black border border-brand-lime/30">
+                    Ver Tudo
+                </button>
+                <button onclick="setCategory('UX')" id="btn-ux" class="category-btn px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 bg-slate-800/60 text-slate-300 hover:bg-slate-800 border border-transparent">
+                    UX & Mobile
+                </button>
+                <button onclick="setCategory('COMPLIANCE')" id="btn-compliance" class="category-btn px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 bg-slate-800/60 text-slate-300 hover:bg-slate-800 border border-transparent">
+                    Capture & NFe
+                </button>
+                <button onclick="setCategory('ANALYTICS')" id="btn-analytics" class="category-btn px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 bg-slate-800/60 text-slate-300 hover:bg-slate-800 border border-transparent">
+                    Gráficos & BI
+                </button>
+                <button onclick="setCategory('ADMIN')" id="btn-admin" class="category-btn px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 bg-slate-800/60 text-slate-300 hover:bg-slate-800 border border-transparent">
+                    Backoffice
+                </button>
+                <button onclick="setCategory('MONETIZATION')" id="btn-monetization" class="category-btn px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 bg-slate-800/60 text-slate-300 hover:bg-slate-800 border border-transparent">
+                    Monetização
+                </button>
+                <button onclick="setCategory('INFRA')" id="btn-infra" class="category-btn px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 bg-slate-800/60 text-slate-300 hover:bg-slate-800 border border-transparent">
+                    Segurança & Custo
+                </button>
+            </div>
+        </div>
+
+        <!-- Priority Shortcuts Filter and Stats Counter -->
+        <div class="flex items-center justify-between mb-4 px-1">
+            <div class="flex gap-2">
+                <button onclick="togglePriorityFilter('ALTA')" id="prio-alta" class="prio-btn px-3 py-1.5 rounded-lg border border-red-500/30 text-xs font-semibold bg-red-950/20 text-red-400 hover:bg-red-950/40 transition">
+                    Prioridade: Alta
+                </button>
+                <button onclick="togglePriorityFilter('MEDIA')" id="prio-media" class="prio-btn px-3 py-1.5 rounded-lg border border-yellow-500/30 text-xs font-semibold bg-yellow-950/20 text-yellow-400 hover:bg-yellow-950/40 transition">
+                    Prioridade: Média
+                </button>
+                <button onclick="togglePriorityFilter('BAIXA')" id="prio-baixa" class="prio-btn px-3 py-1.5 rounded-lg border border-sky-500/30 text-xs font-semibold bg-sky-950/20 text-sky-400 hover:bg-sky-950/40 transition">
+                    Prioridade: Baixa
+                </button>
+                <button onclick="clearFilters()" id="clear-filters-btn" class="hidden px-2.5 py-1.5 rounded-lg text-xs font-semibold text-brand-lime bg-brand-lime/10 hover:bg-brand-lime/20 transition">
+                    Limpar Filtros
+                </button>
+            </div>
+            <div class="text-xs text-brand-muted font-mono" id="results-count">
+                Exibindo 18 de 18 tarefas
+            </div>
+        </div>
+
+        <!-- Backlog Master Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="backlogGrid">
+            
+            <!-- UX 1 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="UX" data-priority="ALTA" data-search="login nativo google one tap magic link fluido biometria motorista aplicativo">
+                <div class="p-5 flex-1 select-none">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-brand-lime bg-brand-lime/10 px-2.5 py-0.5 rounded-full border border-brand-lime/20 font-mono">UX & MOBILE</span>
+                        <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">ALTA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Login Nativo Sem Redirecionamento (One-Tap & Magic Link)</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Implementar autenticação ágil instantânea via Google One-Tap nativo no mobile (PWA) e disparos de Magic Link por WhatsApp/E-mail. Evita perdas por digitação manual de senhas no trânsito.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">10 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Altíssimo</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 1</span>
+                    <span class="font-bold text-slate-400">Complexidade: Média</span>
+                </div>
+            </div>
+
+            <!-- UX 2 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="UX" data-priority="MEDIA" data-search="modo escuro automatico brilho tela solar bateria motorista">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-brand-lime bg-brand-lime/10 px-2.5 py-0.5 rounded-full border border-brand-lime/20 font-mono">UX & MOBILE</span>
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20">MÉDIA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Modo Escuro Otimizado & Ajuste Automático de Visibilidade</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Economia severa de bateria com fundo 100% preto AMOLED para motoristas que usam o app 12h de dia e modo especial de alto contraste para leitura sob sol intenso sem aquecer o celular.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">5 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Alto</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 1</span>
+                    <span class="font-bold text-slate-400">Complexidade: Baixa</span>
+                </div>
+            </div>
+
+            <!-- UX 3 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="UX" data-priority="ALTA" data-search="alertas push georreferenciados proximidade ofertas notificacoes">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-brand-lime bg-brand-lime/10 px-2.5 py-0.5 rounded-full border border-brand-lime/20 font-mono">UX & MOBILE</span>
+                        <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">ALTA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Push Notifications Georreferenciados (Por Proximidade)</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Disparo automático de alerta quando o motorista entrar no raio de um posto parceiro que decretou desconto agressivo. Utiliza o GPS persistente do PWA, economizando dados móveis.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">15 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Altíssimo</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 2</span>
+                    <span class="font-bold text-slate-400">Complexidade: Alta</span>
+                </div>
+            </div>
+
+            <!-- UX 4 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="UX" data-priority="MEDIA" data-search="roteirizacao otimizada desvio inteligente rota ativa uber 99">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-brand-lime bg-brand-lime/10 px-2.5 py-0.5 rounded-full border border-brand-lime/20 font-mono">UX & MOBILE</span>
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20">MÉDIA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Integração com Rotas e Cálculo de "Desvio Inteligente"</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Função inteligente que decide se o trajeto até um posto mais barato compensa financeiramente, calculando o desgaste do carro e combustível gasto até a chegada no local do abastecimento.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">18 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Massa</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 3</span>
+                    <span class="font-bold text-slate-400">Complexidade: Altíssima</span>
+                </div>
+            </div>
+
+            <!-- COMPLIANCE 1 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="COMPLIANCE" data-priority="ALTA" data-search="api sefaz integracao continua processamento nfe xml parceiros">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-green-400 bg-green-500/10 px-2.5 py-0.5 rounded-full border border-green-500/20 font-mono">CAPTURE & NFe</span>
+                        <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">ALTA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Integração Consolidada com API da SEFAZ (Parceiro de Dados)</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Substituir os scripts manuais e oscilantes de scraping de notas fiscais estaduais por parceiros homologados (Ex: Arquivei, Focus NFe) para entrega garantida de dados de abastecimento em milissegundos.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">7 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Crítico</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 1</span>
+                    <span class="font-bold text-slate-400">Complexidade: Média</span>
+                </div>
+            </div>
+
+            <!-- COMPLIANCE 2 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="COMPLIANCE" data-priority="ALTA" data-search="ocr offline camera notas fiscais processamento local cache">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-green-400 bg-green-500/10 px-2.5 py-0.5 rounded-full border border-green-500/20 font-mono">CAPTURE & NFe</span>
+                        <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">ALTA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">OCR Offline de QRCodes & Cupons na Câmera</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Implementar processamento local por Tesseract.js ou Engine On-device para reter as notas fiscais lidas mesmo quando o motorista estiver sem dados móveis ou sob sinal oscilante no pátio do posto.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">14 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Altíssimo</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 2</span>
+                    <span class="font-bold text-slate-400">Complexidade: Altíssima</span>
+                </div>
+            </div>
+
+            <!-- COMPLIANCE 3 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="COMPLIANCE" data-priority="MEDIA" data-search="anti fraudes limites qrcode lixeira cpf placa">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-green-400 bg-green-500/10 px-2.5 py-0.5 rounded-full border border-green-500/20 font-mono">CAPTURE & NFe</span>
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20">MÉDIA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Engine de Proteção Anti-Fraude e Verificação de CPF</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Detectar e invalidar escaneamentos de cupons fiscais baixados do "lixo" do posto para fraudar rankings ou cashback. Heurísticas para limitar quantidade diária de NFes por CPF/Placa de veículo.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">8 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Alto</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 2</span>
+                    <span class="font-bold text-slate-400">Complexidade: Média</span>
+                </div>
+            </div>
+
+            <!-- ANALYTICS 1 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="ANALYTICS" data-priority="ALTA" data-search="simulador economia anual metas caixa lucros ipva">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20 font-mono">GRÁFICOS & BI</span>
+                        <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">ALTA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Simulador de Poupança Acumulada & Metas de Economia</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Criar um painel interativo de gamificação de lucros. Permite definir metas financeiras conectadas à economia gerada (ex: Pagar o IPVA de R$1.800 do ano que vem apenas com economia de combustível sugerida).
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">6 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Altíssimo</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 2</span>
+                    <span class="font-bold text-slate-400">Complexidade: Média</span>
+                </div>
+            </div>
+
+            <!-- ANALYTICS 2 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="ANALYTICS" data-priority="MEDIA" data-search="sazonalidade precos previsao reajuste ia gemini predição">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20 font-mono">GRÁFICOS & BI</span>
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20">MÉDIA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Mapeamento Sazonal e Predição Inteligente via Gemini</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Utilizar modelos de inteligência analítica baseados no histórico de preços coletados para antecipar altas de fim de semana, disparando notificações aos motoristas sugerindo dia ideal para abastecer.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">12 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Diferencial</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 3</span>
+                    <span class="font-bold text-slate-400">Complexidade: Alta</span>
+                </div>
+            </div>
+
+            <!-- ANALYTICS 3 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="ANALYTICS" data-priority="BAIXA" data-search="mapa calor demanda postos frequentados d3js visualizacao georreferenciada">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20 font-mono">GRÁFICOS & BI</span>
+                        <span class="text-xs font-bold text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-full border border-sky-500/20">BAIXA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Mapa de Calor (Density Heatmap) de Abastecimentos B2B</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Mecanismo de visualização complexa de demanda usando D3.js para o backoffice, fornecendo métricas agregadas de preferência de consumo de combustíveis úteis para ofertas direcionadas das redes.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">10 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Geração B2B</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 4</span>
+                    <span class="font-bold text-slate-400">Complexidade: Média</span>
+                </div>
+            </div>
+
+            <!-- ADMIN 1 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="ADMIN" data-priority="ALTA" data-search="curadoria crm motoristas aprovacoes integradas painel moderadores">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-violet-400 bg-violet-500/10 px-2.5 py-0.5 rounded-full border border-violet-500/20 font-mono">BACKOFFICE</span>
+                        <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">ALTA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">CRM de Motoristas & Mesa de Aprovação Integrada</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Central de operações unificada para aprovar em alta velocidade documentos de CNH e veículos de novos parceiros. Botões dinâmicos de aprovação rápida e reenvio de e-mails disparados sob demanda.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">6 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Crítico</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 1</span>
+                    <span class="font-bold text-slate-400">Complexidade: Média</span>
+                </div>
+            </div>
+
+            <!-- ADMIN 2 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="ADMIN" data-priority="ALTA" data-search="auditoria postos bandeiras marcas dados invalidos geo coordenadas">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-violet-400 bg-violet-500/10 px-2.5 py-0.5 rounded-full border border-violet-500/20 font-mono">BACKOFFICE</span>
+                        <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">ALTA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Módulo de Saneamento e Auditoria Geocódigo de Postos</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Ferramenta administrativa para gerir coordenadas (longitude/latitude), bandeiras de postos de gasolina da ANP que estão nulas ou registrar locais novos que aparecem no fluxo diário das frotas.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">5 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Crítico</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 1</span>
+                    <span class="font-bold text-slate-400">Complexidade: Média</span>
+                </div>
+            </div>
+
+            <!-- ADMIN 3 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="ADMIN" data-priority="MEDIA" data-search="campanhas push segmentado marketing disparo direto">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-violet-400 bg-violet-500/10 px-2.5 py-0.5 rounded-full border border-violet-500/20 font-mono">BACKOFFICE</span>
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20">MÉDIA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Módulo de Disparo de Campanhas Geográficas Segmentadas</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Painel de marketing no backoffice para criar e agendar notificações direcionadas, ex: Motoristas ativos de Juiz de Fora em carros flex recebem alerta sobre etanol com desconto.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">9 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Alto</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 3</span>
+                    <span class="font-bold text-slate-400">Complexidade: Média</span>
+                </div>
+            </div>
+
+            <!-- MONETIZATION 1 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="MONETIZATION" data-priority="ALTA" data-search="premium pro frotas assinaturas recorrencia stripe">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20 font-mono">MONETIZAÇÃO</span>
+                        <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">ALTA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Plano Enche o Tanque PRO (Assinaturas SaaS)</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Assinatura paga para liberar exportação automatizada em PDF dos gastos para o imposto de renda, consumo consolidado de múltiplos veículos da casa/frota e metas ilimitadas sem publicidade.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">15 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Assinatura</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 3</span>
+                    <span class="font-bold text-slate-400">Complexidade: Alta</span>
+                </div>
+            </div>
+
+            <!-- MONETIZATION 2 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="MONETIZATION" data-priority="MEDIA" data-search="portal posto distribuidora self service de campanhas patrocinado anuncios">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20 font-mono">MONETIZAÇÃO</span>
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20">MÉDIA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Portal do Proprietário do Posto (Painel Self-Service B2B)</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Painel onde donos de postos individuais criam campanhas de desconto relâmpago para atrair os motoristas da proximidade cadastrados no aplicativo, pagando uma taxa proporcional sobre a atração.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">25 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">B2B Core</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 4</span>
+                    <span class="font-bold text-slate-400">Complexidade: Altíssima</span>
+                </div>
+            </div>
+
+            <!-- MONETIZATION 3 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="MONETIZATION" data-priority="MEDIA" data-search="indique ganhe cashback cupons indicaçoes fidelizacao">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20 font-mono">MONETIZAÇÃO</span>
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20">MÉDIA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Módulo de Cashback e Incentivos via Indique & Ganhe</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Multiplicador de viralidade orgânica do app. Motoristas ganham moedas ou ticks de cashback real creditado ao indicar novos cupons válidos ou trazer novos motoristas para a base ativa.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">12 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Alto</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 3</span>
+                    <span class="font-bold text-slate-400">Complexidade: Média</span>
+                </div>
+            </div>
+
+            <!-- INFRA 1 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="INFRA" data-priority="ALTA" data-search="fallbacks mapa de geocoding custos google maps box openstreetmap latitude longitude">
+                <div class="p-5 flex-1 block">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 font-mono">SEGURANÇA & CUSTO</span>
+                        <span class="text-xs font-bold text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded-full border border-red-500/20">ALTA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Parceiro Secundário de Geocoding (Redução drástica de custos MAPS)</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Preservar margens de faturamento reduzindo os altos valores da API de Geocoding Reversa do Google Maps, chaveando para Mapbox ou OpenStreetMap no caching local inteligente.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">4 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Estratégico</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 2</span>
+                    <span class="font-bold text-slate-400">Complexidade: Média</span>
+                </div>
+            </div>
+
+            <!-- INFRA 2 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="INFRA" data-priority="MEDIA" data-search="redis cache consultas rapidas rankings otimizaçoes performance">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 font-mono">SEGURANÇA & CUSTO</span>
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20">MÉDIA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Arquitetura de Cache Redis de Preços Dinâmicos</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Introduzir caching temporário em memória RAM (Redis) para as consultas complexas na rota de buscas e rankings das cidades parceiras, liberando alta vazão de acessos simultâneos sem gargalo de SQL.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">3 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Eficiência</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 2</span>
+                    <span class="font-bold text-slate-400">Complexidade: Baixa</span>
+                </div>
+            </div>
+
+            <!-- INFRA 3 -->
+            <div class="backlog-card bg-slate-900/50 border border-slate-800 hover:border-brand-lime/30 transition duration-300 rounded-2xl flex flex-col h-full overflow-hidden" 
+                 data-category="INFRA" data-priority="MEDIA" data-search="lgpd exclusao de dados privaciade conformidade total segurança">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 font-mono">SEGURANÇA & CUSTO</span>
+                        <span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20">MÉDIA</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 leading-tight">Módulo Global Auto-Exclusão e Deletion Flow (LGPD)</h3>
+                    <p class="text-sm text-slate-300 mb-4">
+                        Painel avançado na conta do motorista no aplicativo para baixar todas informações retidas do seu veículo e solicitar a exclusão da sua biometria, fotos de CNH de acordo com as leis LGPD vigentes.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-brand-black/40 p-3 rounded-xl">
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Estimativa</span>
+                            <span class="text-slate-200 font-medium">5 dias</span>
+                        </div>
+                        <div>
+                            <span class="text-brand-muted block text-[10px] uppercase">Retorno Comercial</span>
+                            <span class="text-emerald-400 font-semibold font-mono">Segurança</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-800/60 bg-slate-900/30 flex justify-between items-center text-xs font-mono text-brand-muted">
+                    <span>Cronograma: Mês 1</span>
+                    <span class="font-bold text-slate-400">Complexidade: Baixa</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer / Roadmap Timeline Map Area -->
+        <div class="mt-16 bg-slate-900/40 border border-slate-800 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+            <div class="absolute right-0 bottom-0 w-80 h-80 bg-brand-lime/5 rounded-full blur-[80px]"></div>
+            
+            <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-lime" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Cronograma Resumido de Lançamentos (Fases do Negócio)
+            </h3>
+
+            <!-- Horizontal Steps Visual -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+                <!-- Connectors -->
+                <div class="hidden md:block absolute top-12 left-1/8 right-1/8 h-0.5 bg-slate-800 z-0"></div>
+                
+                <!-- Step 1 -->
+                <div class="relative z-10 bg-brand-black/40 rounded-2xl p-5 border border-slate-800/80">
+                    <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center font-mono font-bold text-red-400 mb-3">1</div>
+                    <h4 class="text-white font-bold text-sm">Fase 1: Operações (Mês 1)</h4>
+                    <p class="text-xs text-brand-muted mt-1 leading-relaxed">Foco em consolidar backoffice para auditoria rápida de postos/motoristas e login nativo.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative z-10 bg-brand-black/40 rounded-2xl p-5 border border-slate-800/80">
+                    <div class="w-8 h-8 rounded-lg bg-brand-lime/10 border border-brand-lime/30 flex items-center justify-center font-mono font-bold text-brand-lime mb-3">2</div>
+                    <h4 class="text-white font-bold text-sm">Fase 2: Engajamento (Mês 2)</h4>
+                    <p class="text-xs text-brand-muted mt-1 leading-relaxed">Captura robusta por API SEFAZ de cupons e o simulador gamificado de economia.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative z-10 bg-brand-black/40 rounded-2xl p-5 border border-slate-800/80">
+                    <div class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center font-mono font-bold text-yellow-400 mb-3">3</div>
+                    <h4 class="text-white font-bold text-sm">Fase 3: Receitas (Mês 3)</h4>
+                    <p class="text-xs text-brand-muted mt-1 leading-relaxed">Disparo de campanhas geolocalizadas e o portfólio de planos por assinatura PRO.</p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="relative z-10 bg-brand-black/40 rounded-2xl p-5 border border-slate-800/80">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-mono font-bold text-emerald-400 mb-3">4</div>
+                    <h4 class="text-white font-bold text-sm">Fase 4: Escala (Mês 4)</h4>
+                    <p class="text-xs text-brand-muted mt-1 leading-relaxed">Estruturação de portais de auto-atendimento de postos B2B e o motor de predição.</p>
+                </div>
+            </div>
+
+            <!-- Disclaimer note -->
+            <div class="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-brand-muted">
+                <span>© 2026 Inteligência de Produto Enche o Tanque S.A. Documento estritamente interno e confidencial.</span>
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Conexão Segura Ativa</span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Simple Dynamic Logic Scripts -->
+    <script>
+        let currentCategory = 'ALL';
+        let activePriorityFilters = []; // empty means show all priorities
+
+        function setCategory(category) {
+            currentCategory = category;
+            
+            // update active classes on tabs
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-lime', 'text-brand-black');
+                btn.classList.add('bg-slate-800/60', 'text-slate-300');
+            });
+
+            const currentActiveBtn = document.getElementById('btn-' + category.toLowerCase());
+            if (currentActiveBtn) {
+                currentActiveBtn.classList.remove('bg-slate-800/60', 'text-slate-300');
+                currentActiveBtn.classList.add('bg-brand-lime', 'text-brand-black', 'active');
+            }
+
+            filterBacklog();
+        }
+
+        function togglePriorityFilter(priority) {
+            const index = activePriorityFilters.indexOf(priority);
+            const element = document.getElementById('prio-' + priority.toLowerCase());
+
+            if (index > -1) {
+                activePriorityFilters.splice(index, 1);
+                // remove active design
+                element.className = element.className.replace('bg-opacity-100', '').replace('bg-slate-800', '');
+                if (priority === 'ALTA') element.className = 'prio-btn px-3 py-1.5 rounded-lg border border-red-500/30 text-xs font-semibold bg-red-950/20 text-red-400 hover:bg-red-950/40 transition';
+                if (priority === 'MEDIA') element.className = 'prio-btn px-3 py-1.5 rounded-lg border border-yellow-500/30 text-xs font-semibold bg-yellow-950/20 text-yellow-400 hover:bg-yellow-950/40 transition';
+                if (priority === 'BAIXA') element.className = 'prio-btn px-3 py-1.5 rounded-lg border border-sky-500/30 text-xs font-semibold bg-sky-950/20 text-sky-400 hover:bg-sky-950/40 transition';
+            } else {
+                activePriorityFilters.push(priority);
+                // apply active visual design
+                if (priority === 'ALTA') element.className = 'prio-btn px-3 py-1.5 rounded-lg border border-red-500 text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition shadow-[0_0_10px_rgba(239,68,68,0.2)]';
+                if (priority === 'MEDIA') element.className = 'prio-btn px-3 py-1.5 rounded-lg border border-yellow-500 text-xs font-semibold bg-yellow-500 text-brand-black hover:bg-yellow-600 transition shadow-[0_0_10px_rgba(234,179,8,0.2)]';
+                if (priority === 'BAIXA') element.className = 'prio-btn px-3 py-1.5 rounded-lg border border-sky-500 text-xs font-semibold bg-sky-500 text-white hover:bg-sky-600 transition shadow-[0_0_10px_rgba(14,165,233,0.2)]';
+            }
+
+            document.getElementById('clear-filters-btn').classList.toggle('hidden', activePriorityFilters.length === 0 && currentCategory === 'ALL');
+            filterBacklog();
+        }
+
+        function clearFilters() {
+            activePriorityFilters = [];
+            document.getElementById('prio-alta').className = 'prio-btn px-3 py-1.5 rounded-lg border border-red-500/30 text-xs font-semibold bg-red-950/20 text-red-400 hover:bg-red-950/40 transition';
+            document.getElementById('prio-media').className = 'prio-btn px-3 py-1.5 rounded-lg border border-yellow-500/30 text-xs font-semibold bg-yellow-950/20 text-yellow-400 hover:bg-yellow-950/40 transition';
+            document.getElementById('prio-baixa').className = 'prio-btn px-3 py-1.5 rounded-lg border border-sky-500/30 text-xs font-semibold bg-sky-950/20 text-sky-400 hover:bg-sky-950/40 transition';
+            
+            document.getElementById('clear-filters-btn').classList.add('hidden');
+            document.getElementById('searchInput').value = '';
+            setCategory('ALL');
+        }
+
+        function filterBacklog() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.backlog-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cardCategory = card.getAttribute('data-category');
+                const cardPriority = card.getAttribute('data-priority');
+                const cardSearchText = card.getAttribute('data-search').toLowerCase();
+
+                const matchesCategory = (currentCategory === 'ALL' || cardCategory === currentCategory);
+                const matchesPriority = (activePriorityFilters.length === 0 || activePriorityFilters.includes(cardPriority));
+                const matchesSearch = (!searchQuery || cardSearchText.includes(searchQuery));
+
+                if (matchesCategory && matchesPriority && matchesSearch) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            document.getElementById('results-count').innerText = `Exibindo ${visibleCount} de ${cards.length} tarefas`;
+            document.getElementById('clear-filters-btn').classList.toggle('hidden', activePriorityFilters.length === 0 && currentCategory === 'ALL' && !searchQuery);
+        }
+    </script>
+</body>
+</html>

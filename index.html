@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR" style="color-scheme: dark;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <title>Enche o Tanque - Gestão de Frotas</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/Logo_maker_project.png" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="EncheTanque" />
+    <link rel="apple-touch-icon" href="/Logo_maker_project.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/Logo_maker_project.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/Logo_maker_project.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/Logo_maker_project.png" />
+    <script>
+      // Service Worker registration with better debugging
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then(reg => {
+              console.log('SW Registered!', reg.scope);
+              // Handle updates
+              reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                if (installingWorker) {
+                  installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      console.log('New content is available; please refresh.');
+                    }
+                  };
+                }
+              };
+            })
+            .catch(err => console.error('SW Registration Failed', err));
+        });
+      }
+
+      // Store the install prompt event to trigger manually
+      window.deferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        window.deferredPrompt = e;
+        // Notify the app that installation is possible
+        window.dispatchEvent(new CustomEvent('pwa-installavailable'));
+        console.log('PWA: beforeinstallprompt captured');
+      });
+
+      window.addEventListener('appinstalled', (evt) => {
+        console.log('PWA: App installed successfully');
+        window.deferredPrompt = null;
+      });
+
+      // Detection for iOS "Add to Home Screen" instructions
+      const isIos = () => {
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        return /iphone|ipad|ipod/.test(userAgent);
+      };
+      const isInStandaloneMode = () => ('standalone' in window.navigator) || (window.navigator.standalone);
+
+      if (isIos() && !isInStandaloneMode()) {
+        console.log("Tip: On iOS, use Share > Add to Home Screen to install.");
+      }
+    </script>
+  </head>
+  <body style="background: #0a0a0a; margin: 0; padding: 0;">
+    <div id="splash-overlay" style="position: fixed; inset: 0; background: #0a0a0a; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10001; transition: opacity 0.5s ease-out; overflow: hidden;">
+      <!-- Background Image with Overlay -->
+      <div style="position: absolute; inset: 0; z-index: -1;">
+        <img src="/different-colours-gas-station-pumps-reduzido.jpg" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.3; filter: blur(5px) scale(1.1);" />
+        <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 30%, #0a0a0a 90%);"></div>
+      </div>
+
+      <div style="position: relative; text-align: center; display: flex; flex-direction: column; align-items: center;">
+        <div style="position: relative; margin-bottom: 25px; width: 210px; height: 210px; display: flex; align-items: center; justify-content: center;">
+          <!-- Radar Scanning Lines & Sweeper -->
+          <!-- Static outer grid circle -->
+          <div style="position: absolute; inset: 0; border: 1.5px solid rgba(204, 255, 0, 0.2); border-radius: 50%; z-index: 1;"></div>
+          <!-- Static inner grid circle -->
+          <div style="position: absolute; inset: 25px; border: 1.5px dashed rgba(204, 255, 0, 0.1); border-radius: 50%; z-index: 1;"></div>
+          
+          <!-- Concentric pulsing radar waves -->
+          <div style="position: absolute; inset: 0; border: 2px solid #ccff00; border-radius: 50%; opacity: 0; animation: radar-wave 3s infinite linear; z-index: 1;"></div>
+          <div style="position: absolute; inset: 0; border: 2px solid #ccff00; border-radius: 50%; opacity: 0; animation: radar-wave 3s infinite linear; animation-delay: 1s; z-index: 1;"></div>
+          <div style="position: absolute; inset: 0; border: 2px solid #ccff00; border-radius: 50%; opacity: 0; animation: radar-wave 3s infinite linear; animation-delay: 2s; z-index: 1;"></div>
+          
+          <!-- Radar Sweep Scanner Line (conic gradient with continuous circular sweep) -->
+          <div style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 180deg, rgba(204, 255, 0, 0.01) 220deg, rgba(204, 255, 0, 0.12) 300deg, rgba(204, 255, 0, 0.3) 360deg); animation: radar-sweep 2.5s infinite linear; z-index: 1; pointer-events: none;">
+            <!-- Bright leading sweep line edge (vertical up) -->
+            <div style="position: absolute; top: 0; left: 50%; width: 2.5px; height: 50%; background: linear-gradient(to top, rgba(204, 255, 0, 0.1) 0%, #ccff00 100%); box-shadow: 0 0 10px rgba(204, 255, 0, 0.9), 0 0 20px rgba(204, 255, 0, 0.5); transform: translateX(-50%);"></div>
+          </div>
+
+          <!-- Logo Image inside radar -->
+          <img src="/enche_o_tanque_logo.png" style="width: 130px; height: 130px; object-fit: contain; filter: drop-shadow(0 0 15px rgba(0,255,100,0.4)); z-index: 2;" referrerPolicy="no-referrer" alt="Logo" />
+        </div>
+        
+        <p style="color: rgba(255,255,255,0.85); font-family: 'Inter', system-ui, -apple-system, sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.32em; font-size: 11px; margin-top: 10px; margin-bottom: 0; text-shadow: 0 0 10px rgba(255,255,255,0.2);">Abasteça com inteligência</p>
+        <p style="color: rgba(255,255,255,0.85); font-family: 'Inter', system-ui, -apple-system, sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.32em; font-size: 11px; margin-top: 6px; margin-bottom: 0; text-shadow: 0 0 10px rgba(255,255,255,0.2);">Rode com economia</p>
+      </div>
+
+      <div style="margin-top: 60px; text-align: center; width: 100%; max-width: 200px;">
+        <div id="splash-status" style="color: rgba(204,255,0,0.5); font-family: system-ui, -apple-system, sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; font-size: 9px; margin-bottom: 12px; animation: breathe 2s infinite;">Inicializando o app</div>
+        <div style="width: 100%; height: 2px; background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden; position: relative;">
+          <div id="splash-progress" style="width: 30%; height: 100%; background: #ccff00; box-shadow: 0 0 15px #ccff00; transition: width 0.3s ease;"></div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      @keyframes radar-wave {
+        0% { transform: scale(0.65); opacity: 0.8; }
+        100% { transform: scale(1.25); opacity: 0; }
+      }
+      @keyframes radar-sweep {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes breathe {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 0.8; }
+      }
+    </style>
+
+    <script>
+      // Early progress simulation for static splash
+      (function() {
+        let progress = 30;
+        const bar = document.getElementById('splash-progress');
+        const interval = setInterval(() => {
+          progress += Math.random() * 5;
+          if (progress > 95) progress = 95;
+          if (bar) bar.style.width = progress + '%';
+        }, 200);
+
+        // If PWA update detected early
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            const status = document.getElementById('splash-status');
+            if (status) status.innerText = 'Atualizando o app';
+          });
+        }
+      })();
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

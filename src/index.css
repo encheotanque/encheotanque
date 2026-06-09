@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-background: #050a05;
+  --color-on-background: none;
+  --color-primary: #ccff00;
+  --color-on-primary: #000000;
+  --color-secondary: #DAA520;
+  --color-on-secondary: #000000;
+  --color-surface: #0a0f0a;
+  --color-on-surface: #e0ffe0;
+  --color-surface-container: #101a10;
+  --color-surface-container-low: #080d08;
+  --color-surface-container-high: #152515;
+  --color-surface-container-highest: #204020;
+  --color-surface-container-lowest: #020502;
+  --color-outline: #2a4a2a;
+  --color-outline-variant: #1a2a1a;
+  --color-on-surface-variant: #80ff80;
+  --color-error: #ff4444;
+  --color-on-error: #ffffff;
+}
+
+@utility preserve-3d {
+  transform-style: preserve-3d;
+}
+
+@utility backface-hidden {
+  backface-visibility: hidden;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+@layer base {
+  html, body {
+    color-scheme: dark !important;
+  }
+  body {
+    @apply bg-background text-on-background font-sans overflow-hidden h-full;
+  }
+}
+
+.neon-glow-gold {
+  box-shadow: 0 0 15px rgba(204, 255, 0, 0.35), inset 0 0 5px rgba(204, 255, 0, 0.25);
+}
+
+.neon-text-gold {
+  text-shadow: 0 0 10px rgba(204, 255, 0, 0.55);
+}
+
+.neon-glow-green {
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3), inset 0 0 5px rgba(0, 255, 0, 0.2);
+}
+
+.neon-glow-blue {
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.3), inset 0 0 5px rgba(0, 210, 255, 0.2);
+}
+
+.neon-text-green {
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.neon-text-blue {
+  text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* SweetAlert2 Overrides */
+.swal2-confirm {
+  color: #000 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.swal2-cancel {
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+}
+
+.swal2-popup {
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Simulator viewport overrides */
+.simulator-viewport .min-h-screen {
+  min-height: 100% !important;
+  height: 100% !important;
+}
+.simulator-viewport .h-screen {
+  height: 100% !important;
+}
+.simulator-viewport .fixed {
+  position: absolute !important;
+}
+.simulator-viewport .absolute {
+  /* keep absolute */
+}
+
+/* Custom Radar Concentric Distance Labels on Map */
+.radar-map-label {
+  background-color: rgba(15, 23, 42, 0.75) !important;
+  color: #ffffff !important;
+  font-family: "Manrope", sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  white-space: nowrap !important;
+  letter-spacing: 0.02em !important;
+}
+
+

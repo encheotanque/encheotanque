@@ -1,0 +1,40 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Multi-stop Linear Gradient matching the official logo theme strictly -->
+    <linearGradient id="bgGradient" x1="64" y1="64" x2="448" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0abbc2" />
+      <stop offset="40%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#14318c" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle base -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" />
+
+  <!-- Ground Target / Radius Ring under the Pin (with top gap) -->
+  <path d="M 140,330 A 180,52 0 1,0 372,330" stroke="#f1ad0c" stroke-width="12" stroke-linecap="round" fill="none" />
+
+  <!-- Royal Golden Location Pin -->
+  <path d="M 256,398 C 220,340 148,270 148,172 A 108,108 0 1,1 364,172 C 364,270 292,340 256,398 Z" fill="#f1ad0c" />
+
+  <!-- Cutout Circle (using exact same gradient as base, creating absolute transparency effect) -->
+  <circle cx="256" cy="172" r="64" fill="url(#bgGradient)" />
+
+  <!-- Inside Content: Stylized Nozzle & Water/Fuel Drop -->
+  <g transform="translate(256, 172)">
+    <!-- Rotated Nozzle Group -->
+    <g transform="rotate(-38) translate(-10, 0)">
+      <!-- Nozzle handle body -->
+      <rect x="-32" y="-12" width="50" height="24" rx="5" fill="#f1ad0c" />
+      <!-- Hollow Trigger Guard -->
+      <rect x="-18" y="10" width="30" height="8" rx="2" fill="none" stroke="#f1ad0c" stroke-width="5" />
+      <!-- Spout -->
+      <path d="M 16,-6 L 42,-8 C 45,-8.5 45,-3.5 42,-4 L 16,-2 Z" fill="#f1ad0c" />
+      <!-- Nozzle back coupling detail -->
+      <path d="M -32,-6 C -35,-6 -35,6 -32,6 Z" fill="#f1ad0c" />
+    </g>
+
+    <!-- Fuel Drop pointing straight up -->
+    <path d="M 24,-12 C 24,-12 36,0 36,12 A 12,12 0 0,1 12,12 C 12,0 24,-12 24,-12 Z" fill="#f1ad0c" />
+  </g>
+</svg>
