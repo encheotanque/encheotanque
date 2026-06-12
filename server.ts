@@ -143,14 +143,21 @@ async function startServer() {
     process.env.GOOGLE_CLIENT_SECRET
   );
 
-  const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY,
-    httpOptions: {
-      headers: {
-        'User-Agent': 'aistudio-build',
-      }
+  // Lazy GoogleGenAI client helper
+  const getGoogleGenAI = () => {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) {
+      throw new Error('GEMINI_API_KEY environment variable is required');
     }
-  });
+    return new GoogleGenAI({
+      apiKey: key,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
+  };
 
   const JWT_SECRET = process.env.JWT_SECRET || "enche-o-tanque-secret-2024";
 
@@ -404,7 +411,8 @@ Gere uma resposta estritamente em formato JSON:
   "respostaPersonalizada": "parágrafo de corpo do e-mail de resposta de confirmação de recebimento sem promessa alguma"
 }`;
 
-        const aiResponse = await ai.models.generateContent({
+        const aiInstance = getGoogleGenAI();
+        const aiResponse = await aiInstance.models.generateContent({
           model: "gemini-3.5-flash",
           contents: promptText,
           config: {
