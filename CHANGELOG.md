@@ -2,6 +2,36 @@
 
 Todas as alterações relevantes para este projeto serão documentadas neste arquivo.
 
+## [2.2.0] - 2026-06-11
+
+### ⚙️ Rotina de Tancagem Estrutural & Auditoria ANP
+- **Sincronizador Avançado de Tancagem (ANP API)**: Nova rotina diária às 02:00 AM para sincronizar postos de combustível e matriz estrutural de tancagem e bicos das distribuidoras oficiais direto da ANP API brasileira.
+- **Decomissionamento Automático de Combustíveis**: Desativação inteligente (decomissionamento) e comissionamento de combustíveis individuais por posto. Retira e adiciona combustíveis ativos refletindo exatamente o andamento operacional na ANP base.
+- **Auditoria, Tráfego e Logs (Durable Log Table)**: Sistema integrado para registrar operações detalhadas de inserções, atualizações e modificações em uma tabela legível de auditoria `tb_log_sincronizacao_anp` no banco.
+- **Notificação e Alertas Customizados**: Formatação e disparo automático de e-mail informativo, listando modificações agregadas e detalhadas ocorridas no lote de cada município aos administradores de forma transparente.
+
+## [2.1.0] - 2026-06-11
+
+### 🤖 Fale Conosco Inteligente com IA & Acessibilidade nos E-mails
+- **Respostas Customizadas por IA (Gemini API)**: Integração do modelo Gemini 3.5-flash para ler a mensagem recebida pelo Fale Conosco do site, identificar automaticamente a intenção (Elogio, Reclamação, Dúvida, Solicitação de Cidade/Posto, etc.) e redigir uma resposta de confirmação de recebimento empática, altamente contextualizada e personalizada para o e-mail do remetente, sem realizar promessas ou comprometer prazos.
+- **Cópia Oculta de Segurança para Monitoramento**: Envio de cópia oculta (BCC) da resposta customizada recebida pelo usuário diretamente para `encheotanqueucp@gmail.com` para que a administração saiba exatamente o que foi respondido pela IA.
+- **Melhoria Crítica de Contraste e Acessibilidade**: Toda a comunicação visual dos e-mails enviados (notificação do administrador e confirmação do remetente) foi renovada. Substituímos textos amarelos de baixo contraste por um layout profissional com cabeçalho em verde esmeralda e textos escuros perfeitamente legíveis sobre fundo neutro.
+- **Refinamento da Experiência do Usuário (UX/Anti-Spam)**: 
+  - Simplificação do placeholder de mensagem para "Escreva aqui sua mensagem...".
+  - Campo de proteção anti-spam agora focado na usabilidade, livre de spinners de incremento nativo de número em navegadores, utilizando teclado numérico adequado (`inputmode="numeric"`) e placeholder amigável de interrogação ("?").
+
+## [2.0.0] - 2026-06-11
+
+### 🗺️ Visualização Rápida, Filtros por Bandeira & Novos Canais de Contato
+- **Etiquetas de Preço Direto no Mapa**: Agora é possível visualizar as etiquetas com os preços de combustíveis de cada posto diretamente no mapa de cobertura, evitando a necessidade de clicar de posto em posto para conferir os valores.
+- **Identificação e Filtro por Bandeiras**: Adicionada a identificação visual das bandeiras dos postos diretamente nos mapas de busca. Motoristas agora podem filtrar os postos exibidos por bandeira de preferência.
+- **Estimativa de Economia Avançada**: Nova lógica de cálculo que apresenta, de maneira personalizada, a estimativa do real potencial de economia obtido ao abastecer no posto selecionado comparado à média regional.
+- **Exibição do Preço Médio Municipal**: Disponibilização clara do preço médio praticado no município para servir como régua de comparação aos motoristas.
+- **Novos Canais de Atendimento e Redes**: Integração de novos canais de contato com a equipe de desenvolvimento de forma transparente:
+  - Novo formulário seguro de **Fale Conosco** no site principal com proteção avançada anti-spam.
+  - Link e ícone oficial direcionando para a conta de Instagram do projeto (`@encheotanque.app.br`) no cabeçalho do portal.
+  - Canais de feedback direto integrados no interior do aplicativo.
+
 ## [1.9.0] - 2026-05-30
 
 ### 🚀 Expansão de Cobertura para Minas Gerais & GPS Inteligente
@@ -72,4 +102,4 @@ Todas as alterações relevantes para este projeto serão documentadas neste arq
 - **Responsividade SweetAlert2**: Ajuste no arredondamento (`border-radius`) e bordas dos popups para alinhar com o design geral do app.
 
 ---
-*Última atualização em: 29/05/2026*
+*Última atualização em: 11/06/2026*

@@ -1,12 +1,12 @@
 {
   "name": "enche-o-tanque",
   "private": true,
-  "version": "1.9.0",
+  "version": "2.1.0",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build && vite build --config backoffice/vite.config.ts --outDir ../dist/backoffice backoffice",
-    "start": "node server.ts",
+    "build": "vite build && vite build --config backoffice/vite.config.ts --outDir ../dist/backoffice backoffice && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "start": "node dist/server.cjs",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
@@ -55,6 +55,7 @@
     "vite": "^6.2.0"
   },
   "devDependencies": {
-    "@types/node-cron": "^3.0.11"
+    "@types/node-cron": "^3.0.11",
+    "jimp": "^1.6.1"
   }
 }

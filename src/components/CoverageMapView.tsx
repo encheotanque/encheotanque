@@ -192,9 +192,64 @@ export function CoverageMapView() {
     });
   };
 
+  // Dynamic merge of INITIAL_STATES_INFO with database stats fetched from /api/coverage-stats
+  const [realtimeStats, setRealtimeStats] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/coverage-stats')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setRealtimeStats(data);
+        }
+      })
+      .catch(err => console.error("Error loading realtime stats for map:", err));
+  }, []);
+
+  const stateInfo = useMemo(() => {
+    // Deep clone to ensure no accidental state mutation
+    const info = JSON.parse(JSON.stringify(INITIAL_STATES_INFO));
+
+    if (realtimeStats.length > 0) {
+      const findCityData = (cityName: string) => {
+        return realtimeStats.find(
+          item => item.nm_municipio?.toLowerCase() === cityName.toLowerCase()
+        );
+      };
+
+      // RJ State
+      let rjTotal = 0;
+      let rjIntegrated = 0;
+      info['BR-RJ'].cities.forEach((city: string) => {
+        const d = findCityData(city);
+        if (d) {
+          rjTotal += Number(d.total_postos) || 0;
+          rjIntegrated += Number(d.postos_com_preco) || 0;
+        }
+      });
+      if (rjTotal > 0) info['BR-RJ'].totalStations = rjTotal;
+      if (rjIntegrated > 0) info['BR-RJ'].integratedStations = rjIntegrated;
+
+      // MG State
+      let mgTotal = 0;
+      let mgIntegrated = 0;
+      info['BR-MG'].cities.forEach((city: string) => {
+        const d = findCityData(city);
+        if (d) {
+          mgTotal += Number(d.total_postos) || 0;
+          mgIntegrated += Number(d.postos_com_preco) || 0;
+        }
+      });
+      if (mgTotal > 0) info['BR-MG'].totalStations = mgTotal;
+      if (mgIntegrated > 0) info['BR-MG'].integratedStations = mgIntegrated;
+    }
+
+    return info;
+  }, [realtimeStats]);
+
   // Compile information for active/expansion/planned state
   const selectedStateData = useMemo<StateData>(() => {
-    const defaultData = INITIAL_STATES_INFO[selectedStateId];
+    const defaultData = stateInfo[selectedStateId];
     if (defaultData) {
       return {
         ...defaultData,
@@ -216,20 +271,28 @@ export function CoverageMapView() {
       economyPercentage: '---',
       votes: votes[selectedStateId] || 0
     };
-  }, [selectedStateId, paths, votes]);
+  }, [selectedStateId, paths, votes, stateInfo]);
 
   // Overall statistics for summary labels
   const statsSummary = useMemo(() => {
-    const activeCount = Object.values(INITIAL_STATES_INFO).filter(s => s.status === 'active').length;
-    const expansionCount = Object.values(INITIAL_STATES_INFO).filter(s => s.status === 'expansion').length;
-    const totalIntegrated = Object.values(INITIAL_STATES_INFO).reduce((acc, curr) => acc + curr.integratedStations, 0);
+    const stateInfoValues = Object.values(stateInfo) as any[];
+    const activeCount = stateInfoValues.filter((s: any) => s.status === 'active').length;
+    const expansionCount = stateInfoValues.filter((s: any) => s.status === 'expansion').length;
+    
+    // Sum from stateInfo or direct database stats
+    let totalIntegrated = 0;
+    if (realtimeStats.length > 0) {
+      totalIntegrated = realtimeStats.reduce((acc, curr) => acc + (Number(curr.postos_com_preco) || 0), 0);
+    } else {
+      totalIntegrated = stateInfoValues.reduce((acc: number, curr: any) => acc + (curr.integratedStations || 0), 0);
+    }
 
     return {
       activeCount,
       expansionCount,
       totalIntegrated
     };
-  }, []);
+  }, [stateInfo, realtimeStats]);
 
   if (loading) {
     return (
@@ -293,6 +356,44 @@ export function CoverageMapView() {
         </div>
       </header>
 
+      {/* State Selector Quick Filter Chips */}
+      <div className="px-6 mb-2 mt-4">
+        <div className="bg-surface-container-high/40 p-4 rounded-3xl border border-white/5">
+          <p className="text-[10px] font-black uppercase text-white/40 tracking-wider mb-2.5">
+            Selecione uma Localidade Ativa
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {Object.values(stateInfo).map((state: any) => {
+              const isActive = state.id === selectedStateId;
+              let statusColor = 'bg-[#ccff00]';
+              let activeBtnStyle = 'bg-primary border-transparent text-black shadow-lg shadow-primary/20';
+              if (state.status === 'expansion') {
+                statusColor = 'bg-amber-400';
+                activeBtnStyle = 'bg-amber-400 border-transparent text-black shadow-lg shadow-amber-400/20';
+              } else if (state.status === 'planned') {
+                statusColor = 'bg-white/30';
+                activeBtnStyle = 'bg-white/20 border-transparent text-white shadow-lg shadow-white/10';
+              }
+
+              return (
+                <button
+                  key={state.id}
+                  onClick={() => setSelectedStateId(state.id)}
+                  className={`flex items-center gap-2 py-2 px-3.5 rounded-xl font-bold text-xs uppercase tracking-wider border transition-all ${
+                    isActive
+                      ? activeBtnStyle
+                      : 'bg-surface-container/60 text-white/70 border-white/5 hover:border-white/10 hover:text-white'
+                  }`}
+                >
+                  <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-black' : statusColor} ${state.status === 'active' || state.status === 'expansion' ? 'animate-pulse' : ''}`} />
+                  <span>{state.name} ({state.uf})</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       <div className="px-6 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-4">
         {/* Interactive Brazil Map Container - Takes 7 Cols */}
         <div className="lg:col-span-7 bg-surface-container-high/40 p-5 rounded-3xl border border-white/5 flex flex-col items-center justify-center relative min-h-[380px] md:min-h-[460px]">
@@ -312,7 +413,7 @@ export function CoverageMapView() {
             >
               <g id="states_group">
                 {paths.map((path) => {
-                  const info = INITIAL_STATES_INFO[path.id];
+                  const info = stateInfo[path.id];
                   const isActive = info?.status === 'active';
                   const isExpanding = info?.status === 'expansion';
                   const isSelected = selectedStateId === path.id;
@@ -382,8 +483,8 @@ export function CoverageMapView() {
             </p>
             <p className="text-[9px] font-bold text-[#ccff00] mt-0.5 uppercase tracking-wide">
               {hoveredStateId 
-                ? (INITIAL_STATES_INFO[hoveredStateId]?.status === 'active' ? '● Ativo' : INITIAL_STATES_INFO[hoveredStateId]?.status === 'expansion' ? '▲ Expansão' : '○ Planejado')
-                : (INITIAL_STATES_INFO[selectedStateId]?.status === 'active' ? '● Ativo' : INITIAL_STATES_INFO[selectedStateId]?.status === 'expansion' ? '▲ Expansão' : '○ Planejado')
+                ? (stateInfo[hoveredStateId]?.status === 'active' ? '● Ativo' : stateInfo[hoveredStateId]?.status === 'expansion' ? '▲ Expansão' : '○ Planejado')
+                : (stateInfo[selectedStateId]?.status === 'active' ? '● Ativo' : stateInfo[selectedStateId]?.status === 'expansion' ? '▲ Expansão' : '○ Planejado')
               }
             </p>
           </div>
@@ -457,22 +558,35 @@ export function CoverageMapView() {
                   </div>
 
                   <div className="bg-surface-container/40 p-2.5 rounded-2xl border border-white/5 max-h-[140px] overflow-y-auto no-scrollbar space-y-1.5">
-                    {selectedStateData.cities.map((city, idx) => (
-                      <div 
-                        key={idx}
-                        className="bg-surface-container/80 py-2 px-3 rounded-xl border border-outline-variant/10 flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <MapPin size={10} className={selectedStateData.status === 'active' ? 'text-primary' : 'text-amber-400'} />
-                          <span className="text-[11px] font-black uppercase text-white tracking-wide">{city}</span>
+                    {selectedStateData.cities.map((city, idx) => {
+                      const cityDb = realtimeStats.find(
+                        item => item.nm_municipio?.toLowerCase() === city.toLowerCase()
+                      );
+                      const subtitle = cityDb 
+                        ? `${cityDb.postos_com_preco}/${cityDb.total_postos} postos`
+                        : '';
+                      return (
+                        <div 
+                          key={idx}
+                          className="bg-surface-container/80 py-2 px-3 rounded-xl border border-outline-variant/10 flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2">
+                            <MapPin size={10} className={selectedStateData.status === 'active' ? 'text-primary' : 'text-amber-400'} />
+                            <div className="flex flex-col">
+                              <span className="text-[11px] font-black uppercase text-white tracking-wide">{city}</span>
+                              {subtitle && (
+                                <span className="text-[9px] text-white/50 font-bold">{subtitle}</span>
+                              )}
+                            </div>
+                          </div>
+                          {selectedStateData.status === 'active' ? (
+                            <span className="text-[9px] font-bold text-[#ccff00] bg-[#ccff00]/10 px-2 py-0.5 rounded-md">Ativo</span>
+                          ) : (
+                            <span className="text-[9px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md">Planejado</span>
+                          )}
                         </div>
-                        {selectedStateData.status === 'active' ? (
-                          <span className="text-[9px] font-bold text-[#ccff00] bg-[#ccff00]/10 px-2 py-0.5 rounded-md">Ativo</span>
-                        ) : (
-                          <span className="text-[9px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md">Planejado</span>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </div>

@@ -70,12 +70,24 @@ def mapear_id_produto(descricao_str):
     return None # Não é combustível tabelado ou não reconhecido
 
 def formatar_data_mysql(emissao_str):
-    # Converte '25/03/2026 12:33:39-03:00' para '2026-03-25 12:33:39'
+    if not emissao_str:
+        return None
+    # Converte '25/03/2026 12:33:39-03:00' ou '25/03/2026 12:33' para '2026-03-25 12:33:39'
     try:
-        # Pega a parte antes do timezone (fuso)
+        # Pega a parte antes do fuso ou traços
         dt_base = emissao_str.split('-')[0].strip()
-        dt_obj = datetime.strptime(dt_base, '%d/%m/%Y %H:%M:%S')
-        return dt_obj.strftime('%Y-%m-%d %H:%M:%S')
+        parts = dt_base.split()
+        if len(parts) >= 2:
+            dt_base = f"{parts[0]} {parts[1]}"
+        else:
+            dt_base = parts[0]
+            
+        try:
+            dt_obj = datetime.strptime(dt_base, '%d/%m/%Y %H:%M:%S')
+            return dt_obj.strftime('%Y-%m-%d %H:%M:%S')
+        except Exception:
+            dt_obj = datetime.strptime(dt_base, '%d/%m/%Y %H:%M')
+            return dt_obj.strftime('%Y-%m-%d %H:%M:00')
     except Exception:
         return None
 
@@ -94,94 +106,267 @@ def fetch_nfe_data(url):
         page = context.new_page()
         
         try:
-            # Entra na url e aguarda estabilizar
-            page.goto(url, timeout=30000)
+            # Entra na url e aguarda estabilizar de forma tolerante a redes lentas
+            try:
+                page.goto(url, timeout=30000, wait_until="domcontentloaded")
+            except Exception as e_goto:
+                # Caso ocorra timeout (por trackers ou imagens lentas na SEFAZ), verificamos o html atual
+                if "timeout" in str(e_goto).lower():
+                    try:
+                        html_temp = page.content()
+                        if html_temp and len(html_temp) > 1000 and ("myTable" in html_temp or "tabResult" in html_temp or "Chave" in html_temp):
+                            pass
+                        else:
+                            page.goto(url, timeout=20000, wait_until="commit")
+                    except Exception:
+                        pass
+                else:
+                    raise e_goto
             
-            # Aguarda o JavaScript de desafio da F5 rodar, possivelmente recarregar a página,
-            # e só libera o script quando a bendita tabela E PEO MENOS UM PRODUTO surgir no HTML
-            page.wait_for_selector("#tabResult .txtTit", timeout=20000)
+            # Detecta se é de MG (UF 31 ou domínio mg.gov.br) para adaptar o tempo de espera e seletores
+            chave, cnpj = extract_chave_and_cnpj(url)
+            uf_code = chave[0:2] if chave else None
+            is_mg = (uf_code == "31") or ("mg.gov.br" in url) or ("portalnfce" in url)
             
-            html = page.content()
+            if is_mg:
+                # Sistemas de MG não possuem o WAF anti-bot rígido da F5, carregando diretamente
+                try:
+                    page.wait_for_selector("text=Chave de Acesso, text=Chave, table, .ui-datatable", timeout=15000)
+                except Exception:
+                    pass
+                try:
+                    page.wait_for_load_state("networkidle", timeout=3000)
+                except Exception:
+                    pass
+            else:
+                # Aguarda o JavaScript de desafio da F5 rodar, possivelmente recarregar a página,
+                # e só libera o script quando a bendita tabela E PEO MENOS UM PRODUTO surgir no HTML
+                page.wait_for_selector("#tabResult .txtTit", timeout=20000)
+            
+            # Captura de conteúdo em loop para lidar com redirecionamentos ativos e evitar erro de navegação
+            html = ""
+            for x in range(15):  # Aumentado para até 15 tentativas para lidar com redirecionamentos e navegações ativas
+                try:
+                    html = page.content()
+                    if html and len(html) > 1000 and "navigating" not in html.lower():
+                        break
+                except Exception:
+                    pass
+                page.wait_for_timeout(1000)
+            
+            if not html:
+                try:
+                    html = page.content()
+                except Exception as e_final:
+                    page.wait_for_timeout(2000)
+                    try:
+                        html = page.content()
+                    except Exception:
+                        raise Exception(f"Erro persistente de navegacao na SEFAZ: {e_final}")
             return html
-        except PlaywrightTimeoutError:
-            html = page.content()
-            if "OuvERJ" in html or "endereços IP usados" in html:
-               raise Exception("Acesso bloqueado pelo Firewall da SEFAZ (IP bloqueado).")
-            raise Exception("Timeout aguardando a nota carregar. Provavelmente a SEFAZ está instável ou o anti-bot bloqueou.")
+        except Exception as e:
+            # Caso ocorra qualquer erro de Playwright (como timeout ou navegação), tentamos uma última vez com carinho
+            try:
+                page.wait_for_timeout(2000)
+                html = page.content()
+                if html and len(html) > 1000:
+                    return html
+            except Exception:
+                pass
+            raise e
         finally:
             browser.close()
 
 def parse_nfe_html(html):
     soup = BeautifulSoup(html, 'html.parser')
     
+    items = []
     qtd_total_itens = 0
     valor_total_nota = 0.0
-    
     dh_emissao = None
+
+    # --- 1. TENTA ESTRUTURA DE MINAS GERAIS (MG) ---
+    tbody_mytable = (
+        soup.find('tbody', id='myTable') or 
+        soup.find('tbody', id=re.compile(r'myTable', re.I)) or
+        soup.find('table', class_=re.compile(r'table-striped', re.I)) or
+        soup.find(id=re.compile(r'compraTable_data|itensTable|myTable', re.I))
+    )
     
-    labels = soup.find_all('label')
-    for label in labels:
-        text = label.text.strip().lower()
-        if 'qtd. total de itens' in text:
-            span = label.find_next_sibling('span', class_='totalNumb')
-            if span:
-                try: qtd_total_itens = int(span.text.strip())
-                except ValueError: pass
-        elif 'valor a pagar' in text:
-            span = label.find_next_sibling('span', class_=re.compile('totalNumb'))
-            if span:
-                try: valor_total_nota = float(span.text.strip().replace(',', '.'))
-                except ValueError: pass
+    mg_rows = []
+    if tbody_mytable:
+        mg_rows = tbody_mytable.find_all('tr')
+        
+    if not mg_rows:
+        # Se não achou por ID de tabela, procura por qualquer linha de tabela contendo indicadores de MG
+        for r in soup.find_all('tr'):
+            r_text = r.get_text()
+            if 'un:' in r_text.lower() and ('qtde total' in r_text.lower() or 'qtd' in r_text.lower() or 'valor total' in r_text.lower() or 'l' in r_text.lower()):
+                mg_rows.append(r)
                 
-    # Extrair Data e Hora da Emissão
-    # Ex: <strong> Emissão: </strong>25/03/2026 12:33:39-03:00
-    strongs = soup.find_all('strong')
-    for st in strongs:
-        if 'Emissão:' in st.text:
-            # O texto da data fica "solto" como elemento(TextNode) ao lado do <strong>
-            emissao_text = st.next_sibling
-            if emissao_text and isinstance(emissao_text, str):
-                # Limpa traço de "- Via Consumidor" e captura a data ISO/BR
-                dh_emissao = emissao_text.split('- Via')[0].strip()
-            break
+    if mg_rows:
+        for row in mg_rows:
+            tds = row.find_all('td')
+            if len(tds) >= 3:
+                desc_tag = tds[0].find('h7') or tds[0].find('h6') or tds[0].find('span') or tds[0]
+                desc = desc_tag.text.strip()
+                desc = re.sub(r'\(Código:.*?\)', '', desc).strip()
                 
-    items = []
-    table = soup.find('table', id='tabResult')
-    if table:
-        # Pega todas as TRs da tabela. Em vez de depender do "id=Item", verificamos se ela tem
-        # a classe de produto ou se possui a tag com a classe txtTit (Descrição do produto).
-        rows = table.find_all('tr')
-        for row in rows:
-            desc_tag = row.find('span', class_='txtTit')
+                if not desc or len(desc) < 3:
+                    continue
+                
+                # Encontra TD de Quantidade
+                qtd_td = None
+                for td in tds:
+                    if any(kw in td.text.lower() for kw in ['qtde', 'qtd', 'quantidade', 'qtde total']):
+                        qtd_td = td
+                        break
+                if not qtd_td and len(tds) > 1:
+                    qtd_td = tds[1]
+                
+                qtd = 0.0
+                if qtd_td:
+                    qtd_text = qtd_td.text.strip()
+                    qtd_raw = re.sub(r'[^\d,.]', '', qtd_text).replace(',', '.')
+                    try:
+                        qtd = float(qtd_raw)
+                    except ValueError:
+                        pass
+                
+                # Valor Total
+                total_td = tds[-1] if len(tds) > 2 else tds[1]
+                total_text = total_td.text.strip()
+                total_raw = re.sub(r'[^\d,.]', '', total_text).replace(',', '.')
+                total = 0.0
+                try:
+                    total = float(total_raw)
+                except ValueError:
+                    pass
+                
+                # Unitário calculado
+                unit = 0.0
+                if qtd > 0.0:
+                    unit = round(total / qtd, 4)
+                    
+                items.append({
+                    'descricao': desc,
+                    'quantidade': qtd,
+                    'valor_unitario': unit,
+                    'valor_total': total
+                })
+
+    # --- 2. TENTA ESTRUTURA DO RIO DE JANEIRO (RJ) SE MG NÃO TROUXE ITENS ---
+    if not items:
+        table = soup.find('table', id='tabResult')
+        if table:
+            rows = table.find_all('tr')
+            for row in rows:
+                desc_tag = row.find('span', class_='txtTit')
+                if not desc_tag:
+                    continue
+                desc = desc_tag.text.strip()
+                
+                qtd = 0.0
+                qtd_tag = row.find('span', class_='Rqtd')
+                if qtd_tag:
+                    qtd_raw = qtd_tag.text.replace('Qtde.:', '').strip()
+                    qtd_clean = re.sub(r'[^\d,.]', '', qtd_raw).replace(',', '.')
+                    try: qtd = float(qtd_clean)
+                    except ValueError: pass
+                
+                unit = 0.0
+                unit_tag = row.find('span', class_='RvlUnit')
+                if unit_tag:
+                    unit_raw = unit_tag.text.replace('Vl. Unit.:', '').strip()
+                    unit_clean = re.sub(r'[^\d,.]', '', unit_raw).replace(',', '.')
+                    try: unit = float(unit_clean)
+                    except ValueError: pass
+                
+                total = 0.0
+                total_tag = row.find('span', class_='valor')
+                if total_tag:
+                    total_raw = total_tag.text.strip()
+                    total_clean = re.sub(r'[^\d,.]', '', total_raw).replace(',', '.')
+                    try: total = float(total_clean)
+                    except ValueError: pass
+                    
+                items.append({
+                    'descricao': desc,
+                    'quantidade': qtd,
+                    'valor_unitario': unit,
+                    'valor_total': total
+                })
+
+    # --- 3. SE AINDA NÃO ACHOU PRODUTOS, CORES/CLASSES GENÉRICAS COMO FALLBACK ---
+    if not items:
+        item_rows = soup.find_all(id=re.compile(r'rowAncor|tabResult')) or soup.find_all('tr', class_=re.compile(r'txtLinha|impar|par|ui-widget-content|grid-row'))
+        for row in item_rows:
+            cols = row.find_all('td')
+            if len(cols) < 3:
+                continue
+                
+            desc_tag = row.find(class_=re.compile(r'txtTit|txtTitulo|nom-prod|prod-desc|descricao')) or row.find('span', class_='txtTit') or cols[0]
             if not desc_tag:
-                continue # Se não tem título, não é uma linha de produto (pode ser cabeçalho/total)
+                continue
                 
             desc = desc_tag.text.strip()
+            desc = re.sub(r'\(Código:.*?\)', '', desc).strip()
             
+            if desc.isdigit() and len(cols) > 1:
+                desc_tag = cols[1]
+                desc = desc_tag.text.strip()
+                desc = re.sub(r'\(Código:.*?\)', '', desc).strip()
+                
+            if not desc or len(desc) < 3:
+                continue
+                
             qtd = 0.0
-            qtd_tag = row.find('span', class_='Rqtd')
+            qtd_tag = row.find(class_=re.compile(r'Rqtd|quantidade|qtd')) or row.find('span', class_='Rqtd')
             if qtd_tag:
-                # Remove common prefixes and non-numeric junk, handle comma to dot
                 qtd_raw = qtd_tag.text.replace('Qtde.:', '').strip()
                 qtd_clean = re.sub(r'[^\d,.]', '', qtd_raw).replace(',', '.')
                 try: qtd = float(qtd_clean)
                 except ValueError: pass
-            
+            else:
+                for col in cols:
+                    col_text = col.text.strip().lower()
+                    if 'qtd' in col_text or 'qtde' in col_text:
+                        qtd_raw = re.sub(r'[^\d,.]', '', col_text).replace(',', '.')
+                        try: qtd = float(qtd_raw); break
+                        except ValueError: pass
+                        
             unit = 0.0
-            unit_tag = row.find('span', class_='RvlUnit')
+            unit_tag = row.find(class_=re.compile(r'RvlUnit|vlUnit|vl-unit')) or row.find('span', class_='RvlUnit')
             if unit_tag:
                 unit_raw = unit_tag.text.replace('Vl. Unit.:', '').strip()
                 unit_clean = re.sub(r'[^\d,.]', '', unit_raw).replace(',', '.')
                 try: unit = float(unit_clean)
                 except ValueError: pass
-            
+            else:
+                for col in cols:
+                    col_text = col.text.strip().lower()
+                    if 'vl.' in col_text or 'unit' in col_text:
+                        unit_raw = re.sub(r'[^\d,.]', '', col_text).replace(',', '.')
+                        try: unit = float(unit_raw); break
+                        except ValueError: pass
+                        
             total = 0.0
-            total_tag = row.find('span', class_='valor')
+            total_tag = row.find(class_=re.compile(r'valor|total|vTotal|RvalRec')) or row.find('span', class_='valor')
             if total_tag:
                 total_raw = total_tag.text.strip()
                 total_clean = re.sub(r'[^\d,.]', '', total_raw).replace(',', '.')
                 try: total = float(total_clean)
                 except ValueError: pass
+            else:
+                total_raw = cols[-1].text.strip()
+                total_clean = re.sub(r'[^\d,.]', '', total_raw).replace(',', '.')
+                try: total = float(total_clean)
+                except ValueError: pass
+                
+            if qtd == 0.0 and unit > 0.0 and total > 0.0:
+                qtd = round(total / unit, 3)
+            elif unit == 0.0 and qtd > 0.0 and total > 0.0:
+                unit = round(total / qtd, 3)
                 
             items.append({
                 'descricao': desc,
@@ -189,7 +374,133 @@ def parse_nfe_html(html):
                 'valor_unitario': unit,
                 'valor_total': total
             })
-    
+
+    # --- 4. ÚLTIMO FALLBACK SEM TABELA EXPLÍCITA (LAYOUTS MOBILE ETC) ---
+    if not items:
+        name_tags = soup.find_all(class_=re.compile(r'txtTit|txtTitulo|nom-prod|prod-desc|descricao'))
+        for name_tag in name_tags:
+            name = name_tag.text.strip()
+            name = re.sub(r'\(Código:.*?\)', '', name).strip()
+            if not name or len(name) < 3:
+                continue
+            container = name_tag.find_parent('tr') or name_tag.find_parent('div') or name_tag.find_parent()
+            if container:
+                qty_tag = container.find(class_=re.compile(r'Rqtd|quantidade|qtd'))
+                qty = 1.0
+                if qty_tag:
+                    try: qty = float(re.sub(r'[^\d,.]', '', qty_tag.text).replace(',', '.'))
+                    except ValueError: pass
+                    
+                tot_tag = container.find(class_=re.compile(r'valor|total|vTotal|RvalRec'))
+                total = 0.0
+                if tot_tag:
+                    try: total = float(re.sub(r'[^\d,.]', '', tot_tag.text).replace(',', '.'))
+                    except ValueError: pass
+                    
+                unit_tag = container.find(class_=re.compile(r'RvlUnit|vlUnit|vl-unit'))
+                unit = 0.0
+                if unit_tag:
+                    try: unit = float(re.sub(r'[^\d,.]', '', unit_tag.text).replace(',', '.'))
+                    except ValueError: pass
+                    
+                if total == 0.0 and unit > 0.0:
+                    total = round(qty * unit, 2)
+                elif unit == 0.0 and total > 0.0:
+                    unit = round(total / qty, 3)
+                    
+                items.append({
+                    'descricao': name,
+                    'quantidade': qty,
+                    'valor_unitario': unit,
+                    'valor_total': total
+                })
+
+    # --- 5. DETECÇÃO E RESGATE DE ATRIBUTOS DA NOTA (DATA EMISSÃO) ---
+    # Tenta obter Data de Emissão (tabelas de MG)
+    for tab in soup.find_all('table'):
+        headers = [th.text.strip().lower() for th in tab.find_all('th')]
+        if 'data emissão' in headers or 'data de emissão' in headers:
+            try:
+                col_idx = headers.index('data emissão')
+            except ValueError:
+                col_idx = headers.index('data de emissão')
+            tbody = tab.find('tbody')
+            if tbody:
+                tr = tbody.find('tr')
+                if tr:
+                    tds = tr.find_all('td')
+                    if len(tds) > col_idx:
+                        dh_emissao = tds[col_idx].text.strip()
+                        break
+
+    # Tenta obter Data de Emissão (Layout RJ)
+    if not dh_emissao:
+        strongs = soup.find_all('strong')
+        for st in strongs:
+            if 'Emissão:' in st.text:
+                emissao_text = st.next_sibling
+                if emissao_text and isinstance(emissao_text, str):
+                    dh_emissao = emissao_text.split('- Via')[0].strip()
+                break
+
+    # Fallback frouxo para qualquer data/hora via regex
+    if not dh_emissao:
+        all_text = soup.get_text()
+        date_match = re.search(r'(\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2}:\d{2})', all_text)
+        if not date_match:
+            date_match = re.search(r'(\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2})', all_text)
+        if date_match:
+            dh_emissao = date_match.group(1)
+
+    # --- 6. DETECÇÃO E RESGATE DE ATRIBUTOS DA NOTA (TOTAIS) ---
+    # Tenta obter por estruturas de Strongs (MG)
+    strongs_all = soup.find_all('strong')
+    for idx, st in enumerate(strongs_all):
+        text = st.text.strip().lower()
+        if any(kw in text for kw in ['qtde total de íte', 'quantidade total de íte', 'total de itens']):
+            for next_st in strongs_all[idx+1:idx+4]:
+                val_str = next_st.text.strip()
+                if val_str.isdigit():
+                    qtd_total_itens = int(val_str)
+                    break
+        elif any(kw in text for kw in ['valor total r$', 'valor pago r$', 'total r$']):
+            for next_st in strongs_all[idx+1:idx+4]:
+                val_str = next_st.text.strip()
+                val_str_clean = re.sub(r'[^\d,.]', '', val_str).replace(',', '.')
+                if val_str_clean:
+                    try:
+                        val_float = float(val_str_clean)
+                        if val_float > 0.0 and (valor_total_nota == 0.0 or 'total r$' in text):
+                            valor_total_nota = val_float
+                            break
+                    except ValueError:
+                        pass
+
+    # Tenta obter por estruturas de Labels (RJ / Outros)
+    labels = soup.find_all('label')
+    for label in labels:
+        text = label.text.strip().lower()
+        if 'qtd. total de itens' in text or 'total de itens' in text:
+            span = label.find_next_sibling('span', class_='totalNumb') or label.find_next()
+            if span:
+                try: 
+                    clean_num = re.sub(r'[^\d]', '', span.text.strip())
+                    if clean_num: qtd_total_itens = int(clean_num)
+                except ValueError: pass
+        elif 'valor a pagar' in text or 'valor total' in text or 'total a pagar' in text:
+            span = label.find_next_sibling('span', class_=re.compile('totalNumb')) or label.find_next()
+            if span:
+                try: 
+                    clean_val = re.sub(r'[^\d,.]', '', span.text.strip()).replace(',', '.')
+                    if clean_val: valor_total_nota = float(clean_val)
+                except ValueError: pass
+
+    # Sincroniza e corrige caso estejam ausentes/zerados
+    if valor_total_nota == 0.0 and items:
+        valor_total_nota = sum(item['valor_total'] for item in items)
+    if qtd_total_itens == 0 and items:
+        qtd_total_itens = len(items)
+
     return {
         'qtd_total_itens': qtd_total_itens,
         'valor_total_nota': valor_total_nota,
@@ -199,7 +510,7 @@ def parse_nfe_html(html):
 
 def main():
     print("==================================================")
-    print(" Iniciando Rotina de Scrapping NFe (SEFAZ RJ) ")
+    print(" Iniciando Rotina de Scrapping NFe (SEFAZ RJ / MG) ")
     print("==================================================\n")
     
     try:
@@ -210,7 +521,7 @@ def main():
 
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT id_qrcode, url_qrcode, dt_qrcode FROM tb_qrcode WHERE fl_processado = 0 LIMIT 5")
+            cursor.execute("SELECT id_qrcode, url_qrcode, dt_qrcode, id_veiculo FROM tb_qrcode WHERE fl_processado = 0 LIMIT 5")
             qrcodes = cursor.fetchall()
 
             if not qrcodes:
@@ -222,6 +533,7 @@ def main():
             for qr in qrcodes:
                 id_qr = qr['id_qrcode']
                 url = qr['url_qrcode']
+                id_veiculo = qr.get('id_veiculo')
                 now_str = datetime.now().strftime('%H:%M:%S')
                 print(f"[{now_str}] --- Processando ID_QRCODE {id_qr} ---")
                 
@@ -234,15 +546,18 @@ def main():
                     if posto:
                         print(f" Posto...: {posto['nm_posto']} (ID: {posto['id_posto']}) Município: {posto.get('nm_municipio')}")
                     else:
-                        print(f" Aviso: Posto CNPJ {cnpj} não localizado no banco.")
+                        now_proc = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        print(f" [{now_proc}] Aviso: Posto CNPJ {cnpj} não localizado no banco.")
                         cursor.execute("UPDATE tb_qrcode SET fl_processado = 2, dh_processamento = NOW() WHERE id_qrcode = %s", (id_qr,))
                         conn.commit()
-                        print(f" [Aviso] QR Code {id_qr} marcado como fl_processado = 2 (Posto não cadastrado).")
+                        print(f" [{now_proc}] [REJEITADA] QR Code {id_qr} marcado como fl_processado = 2 (Posto não cadastrado).")
                         continue
                 else:
-                    print(" Aviso: Não foi possível extrair a chave a partir da URL.")
+                    now_proc = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    print(f" [{now_proc}] Aviso: Não foi possível extrair a chave a partir da URL.")
                     cursor.execute("UPDATE tb_qrcode SET fl_processado = 2, dh_processamento = NOW() WHERE id_qrcode = %s", (id_qr,))
                     conn.commit()
+                    print(f" [{now_proc}] [REJEITADA] QR Code {id_qr} marcado como fl_processado = 2 (Não foi possível extrair chave/CNPJ).")
                     continue
 
                 try:
@@ -320,17 +635,17 @@ def main():
                                     existing = cursor.fetchone()
 
                                     if existing:
-                                        print(f"       [~] Registro existente para QR Code {id_qr} e Combustível {id_combustivel}. Atualizando litros e economia...")
+                                        print(f"       [~] Registro existente para QR Code {id_qr} e Combustível {id_combustivel}. Atualizando litros, economia e veículo...")
                                         cursor.execute(
-                                            "UPDATE tb_abastecimentos SET nu_litros = %s, vl_economia = %s WHERE id_qrcode = %s AND id_combustivel = %s",
-                                            (item['quantidade'], vl_economia, id_qr, id_combustivel)
+                                            "UPDATE tb_abastecimentos SET nu_litros = %s, vl_economia = %s, id_veiculo = %s WHERE id_qrcode = %s AND id_combustivel = %s",
+                                            (item['quantidade'], vl_economia, id_veiculo, id_qr, id_combustivel)
                                         )
                                     else:
                                         cursor.execute(
                                             """
                                             INSERT INTO tb_abastecimentos 
-                                            (id_posto, id_combustivel, login, vl_preco_unitario, nu_litros, vl_economia, dh_emissao_nfe, tp_fonte, geo_latitude, geo_longitude, id_qrcode) 
-                                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                            (id_posto, id_combustivel, login, vl_preco_unitario, nu_litros, vl_economia, dh_emissao_nfe, tp_fonte, geo_latitude, geo_longitude, id_qrcode, id_veiculo) 
+                                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                                             """,
                                             (
                                                 posto['id_posto'], 
@@ -343,7 +658,8 @@ def main():
                                                 'NFC-e',
                                                 posto.get('geo_latitude'),
                                                 posto.get('geo_longitude'),
-                                                id_qr
+                                                id_qr,
+                                                id_veiculo
                                             )
                                         )
                                         print(f"       [+] Salvo em tb_abastecimentos (ID_Comb:{id_combustivel})")
@@ -408,22 +724,29 @@ def main():
                     
                     # Marca como processado e registra data de processamento
                     try:
-                        cursor.execute("UPDATE tb_qrcode SET fl_processado = 1, dh_processamento = NOW() WHERE id_qrcode = %s", (id_qr,))
-                        conn.commit()
-                        print(f"\n [OK] NF {id_qr} finalizada!")
+                        now_proc = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        if tem_produto:
+                            cursor.execute("UPDATE tb_qrcode SET fl_processado = 1, dh_processamento = NOW() WHERE id_qrcode = %s", (id_qr,))
+                            conn.commit()
+                            print(f"\n [{now_proc}] [OK] NF {id_qr} finalizada!")
+                        else:
+                            cursor.execute("UPDATE tb_qrcode SET fl_processado = 2, dh_processamento = NOW() WHERE id_qrcode = %s", (id_qr,))
+                            conn.commit()
+                            print(f"\n [{now_proc}] [REJEITADA] QR Code {id_qr} marcado como fl_processado = 2 (Nenhum abastecimento inserido).")
                     except Exception as e_upd:
                         print(f" [ERRO] Falha ao atualizar tb_qrcode: {e_upd}")
                     
                     print("====================================================\n")
                     
                 except Exception as ex:
-                    print(f" [ERRO SEFAZ]: {ex}\n")
+                    now_proc = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    print(f" [{now_proc}] [ERRO SEFAZ]: {ex}\n")
                     try:
                         cursor.execute("UPDATE tb_qrcode SET fl_processado = 2, dh_processamento = NOW() WHERE id_qrcode = %s", (id_qr,))
                         conn.commit()
-                        print(f" [Aviso] QR Code {id_qr} marcado como fl_processado = 2 devido a erro na SEFAZ.")
+                        print(f" [{now_proc}] [REJEITADA] QR Code {id_qr} marcado como fl_processado = 2 devido a erro na SEFAZ.")
                     except Exception as e_upd_err:
-                        print(f" [ERRO] Falha ao marcar QR Code como erro: {e_upd_err}")
+                        print(f" [{now_proc}] [ERRO] Falha ao marcar QR Code como erro: {e_upd_err}")
                 
     finally:
         conn.close()

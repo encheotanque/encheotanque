@@ -106,7 +106,7 @@ async function main() {
                     // Newly register gas station
                     const [resInsert]: any = await conn.execute(`
                         INSERT INTO tb_postos 
-                        (nu_cnpjposto, nu_autorizacaoanp, nm_posto, ds_endereco, ds_complemento, nm_bairro, nu_cep, sg_ufposto, nm_municipio, geo_latitude, geo_longitude, nm_bandeira, fg_ativo)
+                        (nu_cnpjposto, nu_autorizacaoanp, nm_posto, ds_endereco, ds_complemento, nm_bairro, nu_cep, sg_ufposto, nm_municipio, geo_latitude, geo_longitude, nm_bandeira, fl_ativo)
                         VALUES (?, ?, ?, ?, ?, ?, ?, 'MG', 'Juiz de Fora', '0', '0', ?, 1)
                     `, [cnpj, autorizacao, name, endereco, complemento, bairro, cep, bandeira]);
                     

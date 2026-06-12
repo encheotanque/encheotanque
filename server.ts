@@ -15,6 +15,8 @@ import compression from "compression";
 import { exec } from "child_process";
 import { promisify } from "util";
 import cron from "node-cron";
+import { GoogleGenAI } from "@google/genai";
+import { runAnpTancagemSync } from "./app/applet/sync_tancagem.js";
 
 const execAsync = promisify(exec);
 
@@ -140,6 +142,15 @@ async function startServer() {
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET
   );
+
+  const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build',
+      }
+    }
+  });
 
   const JWT_SECRET = process.env.JWT_SECRET || "enche-o-tanque-secret-2024";
 
@@ -348,6 +359,183 @@ async function startServer() {
       return true;
     } catch (error) {
       console.error("[MAIL] Error sending feedback email:", error);
+      return false;
+    }
+  }
+
+  async function sendContactEmail(senderEmail: string, message: string, senderName: string, senderPhone: string) {
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.warn("[MAIL] SMTP credentials not set for contact.");
+      console.log(`[CONTACT] To encheotanqueucp@gmail.com with BCC for admins. From ${senderName} (${senderEmail}): ${message}`);
+      return true;
+    }
+
+    const adminEmails = [
+      process.env.MARCIO_EMAIL || "marcio.vasconcellos@gmail.com",
+      process.env.GIOVANA_EMAIL
+    ].filter(Boolean) as string[];
+
+    // Identify message type using Gemini API if key is set, and draft a tailored, empathetic, non-committal reply
+    let aiParagraph = "Sua mensagem foi recebida com sucesso por nossa equipe de desenvolvimento! Vamos analisar com atenção cada detalhe do seu contato para continuarmos aprimorando nossa plataforma colaborativa.";
+    let categoryTitle = "Mensagem Recebida";
+
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const sysInstruction = `Você é o assistente virtual de inteligência de atendimento ao cliente do portal "Enche o Tanque" (uma plataforma colaborativa para economia de combustíveis).
+Sua tarefa é analisar a mensagem recebida pelo Fale Conosco, categorizá-la, e escrever um parágrafo personalizado de confirmação de recebimento para o e-mail do usuário.
+
+REGRAS IMPERATIVAS:
+1. AGRADEÇA de forma simpática, prestativa, polida e amigável.
+2. Contextualize a resposta de acordo com o teor da mensagem do usuário (exemplos: se o usuário pediu de novos postos ou cadastro de sua cidade, se reclamou de preço errado, se sugeriu algo novo no app, elogiou o sistema, etc.).
+3. NUNCA faça promessas, garantias, prazos ou compromissos. Use expressões como: "nosso time irá avaliar suas considerações com carinho", "as informações foram encaminhadas para nossa análise de viabilidade técnica", "iremos averiguar o informado", etc.
+4. Escreva em português brasileiro fluido e com gramática excelente.
+5. Escreva apensa o parágrafo de conteúdo. NÃO inclua saudações (como "Olá, João") nem despedidas ou assinaturas ("Atenciosamente, Equipe Enche o Tanque"), pois o template do e-mail já cuida dessas frentes.
+6. Limite-se a um parágrafo curto e objetivo (até 4-5 linhas).`;
+
+        const promptText = `Informações do Contato:
+Nome: ${senderName}
+Email: ${senderEmail}
+Mensagem Original:
+"${message}"
+
+Gere uma resposta estritamente em formato JSON:
+{
+  "categoria": "Elogio, Reclamação, Dúvida, Nova Cidade/Posto, Sugestão de Recursos, Relato de Erro ou Outro",
+  "respostaPersonalizada": "parágrafo de corpo do e-mail de resposta de confirmação de recebimento sem promessa alguma"
+}`;
+
+        const aiResponse = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: promptText,
+          config: {
+            systemInstruction: sysInstruction,
+            responseMimeType: "application/json",
+          }
+        });
+
+        const textResponse = aiResponse.text;
+        if (textResponse) {
+          const parsed = JSON.parse(textResponse.trim());
+          if (parsed && parsed.respostaPersonalizada) {
+            aiParagraph = parsed.respostaPersonalizada;
+          }
+          if (parsed && parsed.categoria) {
+            categoryTitle = parsed.categoria;
+          }
+        }
+      } catch (aiErr) {
+        console.warn("[GEMINI_CONTACT] AI response generation failed, fallback applied:", aiErr);
+      }
+    }
+
+    // 1. Send feedback form email to project email with BCC to administrators (with improved color contrast)
+    const adminMailOptions = {
+      from: `"Enche o Tanque - Fale Conosco" <${process.env.SMTP_USER}>`,
+      to: "encheotanqueucp@gmail.com",
+      bcc: adminEmails,
+      replyTo: senderEmail,
+      subject: `📬 Fale Conosco: [${categoryTitle}] de ${senderName}`,
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 20px auto; padding: 40px; border: 1px solid #d1d5db; border-radius: 20px; background-color: #ffffff; color: #1f2937; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #111827; text-transform: uppercase; margin: 0; font-size: 24px; font-weight: 800;">CONTATO: <span style="color: #047857;">FALE CONOSCO</span></h2>
+            <p style="color: #4b5563; font-size: 14px; margin-top: 5px; font-weight: 500;">Uma nova mensagem foi recebida no site!</p>
+            <span style="display: inline-block; background-color: #f3f4f6; color: #374151; font-size: 11px; padding: 4px 10px; border-radius: 9999px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid #e5e7eb;">${categoryTitle}</span>
+          </div>
+          
+          <div style="background-color: #f9fafb; padding: 25px; border-radius: 15px; margin-bottom: 30px; border-left: 4px solid #059669; border: 1px solid #e5e7eb; border-left-width: 4px;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">
+                  <strong style="color: #374151; font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 2px; font-weight: 700; letter-spacing: 0.5px;">Nome</strong>
+                  <span style="font-weight: 700; font-size: 16px; color: #111827;">${senderName}</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">
+                  <strong style="color: #374151; font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 2px; font-weight: 700; letter-spacing: 0.5px;">E-mail</strong>
+                  <span style="font-size: 14px; color: #111827; font-weight: 600;">${senderEmail}</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0;">
+                  <strong style="color: #374151; font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 2px; font-weight: 700; letter-spacing: 0.5px;">Telefone</strong>
+                  <span style="font-size: 14px; color: #111827; font-weight: 600;">${senderPhone}</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="padding: 25px; background: #ffffff; border: 1px dashed #9ca3af; border-radius: 15px; line-height: 1.6; color: #1f2937; font-size: 16px;">
+            <div style="color: #9cb3af; font-size: 24px; line-height: 0; margin-bottom: 10px;">&ldquo;</div>
+            ${message.replace(/\n/g, '<br>')}
+            <div style="color: #9cb3af; font-size: 24px; line-height: 0; margin-top: 10px; text-align: right;">&rdquo;</div>
+          </div>
+          
+          <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
+            <p style="font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin: 0; font-weight: 600;">Enche o Tanque • Fale Conosco Site</p>
+          </div>
+        </div>
+      `
+    };
+
+    // 2. Send confirmation to the contact sender (with high contrast and standard notification + specialized paragraph)
+    const confirmationMailOptions = {
+      from: `"Enche o Tanque" <${process.env.SMTP_USER}>`,
+      to: senderEmail,
+      bcc: "encheotanqueucp@gmail.com",
+      subject: `Recebemos seu contato! - Enche o Tanque`,
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 20px auto; padding: 40px; border: 1px solid #d1d5db; border-radius: 20px; background-color: #ffffff; color: #1f2937; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #111827; margin: 0; font-size: 22px; font-weight: 800;">Olá, <span style="color: #047857;">${senderName}</span>!</h2>
+            <p style="color: #4b5563; font-size: 14px; margin-top: 8px; font-weight: 500;">Agradecemos por entrar em contato conosco.</p>
+          </div>
+          
+          <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #10b981; padding: 20px; border-radius: 12px; margin-bottom: 25px; font-size: 14px; line-height: 1.6; color: #14532d;">
+            <strong>📬 Mensagem recebida com sucesso!</strong><br>
+            Sua mensagem de assunto <strong>"${categoryTitle}"</strong> foi registrada de forma segura em nosso sistema. Nosso time de desenvolvimento já foi notificado!
+          </div>
+
+          <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin-bottom: 20px;">
+            ${aiParagraph}
+          </p>
+          
+          <p style="font-size: 13px; line-height: 1.6; color: #4b5563; margin-bottom: 25px;">
+            Para seu controle e segurança, segue uma cópia dos detalhes que você informou no formulário:
+          </p>
+
+          <div style="background-color: #f9fafb; padding: 20px; border-radius: 12px; margin-bottom: 30px; font-size: 13px; border: 1px solid #e5e7eb; border-left: 4px solid #059669; color: #1f2937;">
+            <p style="margin: 0 0 8px 0; color: #111827;"><strong style="color: #4b5563;">Nome:</strong> ${senderName}</p>
+            <p style="margin: 0 0 8px 0; color: #111827;"><strong style="color: #4b5563;">Telefone:</strong> ${senderPhone}</p>
+            <p style="margin: 0 0 8px 0; color: #111827;"><strong style="color: #4b5563;">E-mail:</strong> ${senderEmail}</p>
+            <div style="margin: 12px 0 0 0; padding-top: 12px; border-top: 1px solid #e5e7eb; font-style: italic; color: #374151; background: #ffffff; padding: 10px; border-radius: 6px;">
+               "${message.replace(/\n/g, '<br>')}"
+            </div>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="https://encheotanque.app.br" style="background-color: #059669; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 13px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Visitar nosso Site</a>
+          </div>
+
+          <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 25px 0;">
+          <div style="text-align: center;">
+            <p style="font-size: 11px; color: #4b5563; margin: 0 0 5px 0; font-weight: 600;">Enche o Tanque • Inteligência Coletiva</p>
+            <p style="font-size: 10px; color: #9ca3af; margin: 0;">Este é um e-mail automático de confirmação de recebimento.</p>
+          </div>
+        </div>
+      `
+    };
+
+    try {
+      await Promise.all([
+        transporter.sendMail(adminMailOptions),
+        transporter.sendMail(confirmationMailOptions)
+      ]);
+      console.log(`[MAIL] Contact email and confirmation sent successfully. Sender: ${senderEmail}`);
+      return true;
+    } catch (error) {
+      console.error("[MAIL] Error sending contact or confirmation email:", error);
       return false;
     }
   }
@@ -1229,6 +1417,7 @@ async function startServer() {
           p.id_posto, 
           p.nm_posto, 
           p.nm_bandeira,
+          p.nm_municipio, 
           p.geo_latitude as lat, 
           p.geo_longitude as lng,
           u.price,
@@ -1323,6 +1512,20 @@ async function startServer() {
       // Sort by price before ranking
       filteredResults.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
 
+      // Map each municipality in allResults to its maximum price
+      const maxPriceByMunicipio: Record<string, number> = {};
+      for (const r of allResults) {
+         if (r.nm_municipio && r.price) {
+            const muniKey = r.nm_municipio.trim().toUpperCase();
+            const pVal = parseFloat(r.price);
+            if (!isNaN(pVal) && pVal > 0) {
+               if (maxPriceByMunicipio[muniKey] === undefined || pVal > maxPriceByMunicipio[muniKey]) {
+                  maxPriceByMunicipio[muniKey] = pVal;
+               }
+            }
+         }
+      }
+
       // Calculate ranks for the top 3 cheapest
       let currentRank = 1;
       let lastPrice = -1;
@@ -1336,9 +1539,13 @@ async function startServer() {
           currentRank++;
         }
         
+        const muniKey = row.nm_municipio ? row.nm_municipio.trim().toUpperCase() : "";
+        const maxPriceInMunicipio = muniKey ? (maxPriceByMunicipio[muniKey] || priceNum) : priceNum;
+        
         return {
           ...row,
-          rank: currentRank <= 3 ? currentRank : null
+          rank: currentRank <= 3 ? currentRank : null,
+          maxPriceInMunicipio
         };
       });
 
@@ -1433,6 +1640,25 @@ async function startServer() {
       res.json({ success: true });
     } else {
       res.status(500).json({ error: "Erro ao processar feedback. Tente novamente mais tarde." });
+    }
+  });
+
+  app.post("/api/contact", async (req, res) => {
+    const { name, phone, email, message } = req.body;
+
+    if (!name || name.trim().length === 0 || !phone || phone.trim().length === 0 || !email || email.trim().length === 0 || !message || message.trim().length === 0) {
+      return res.status(400).json({ error: "Todos os campos são obrigatórios" });
+    }
+
+    if (message.length > 1024) {
+      return res.status(400).json({ error: "A mensagem deve ter no máximo 1KB" });
+    }
+
+    const success = await sendContactEmail(email, message, name, phone);
+    if (success) {
+      res.json({ success: true });
+    } else {
+      res.status(500).json({ error: "Erro ao processar mensagem. Tente novamente mais tarde." });
     }
   });
 
@@ -1959,7 +2185,7 @@ async function startServer() {
 
           const [insertRes]: any = await pool.execute(
             `INSERT INTO tb_postos 
-             (nu_cnpjposto, nu_autorizacaoanp, nm_posto, ds_endereco, ds_complemento, nm_bairro, nu_cep, sg_ufposto, nm_municipio, geo_latitude, geo_longitude, nm_bandeira, fg_ativo)
+             (nu_cnpjposto, nu_autorizacaoanp, nm_posto, ds_endereco, ds_complemento, nm_bairro, nu_cep, sg_ufposto, nm_municipio, geo_latitude, geo_longitude, nm_bandeira, fl_ativo)
              VALUES (?, 'PENDENTE', ?, ?, ?, ?, ?, ?, ?, '0', '0', ?, 1)`,
             [rawCnpj, finalNmPosto, finalAddress, finalComplemento, finalBairro, cleanCep, finalUf, finalMunicipio, finalBandeira]
           );
@@ -2347,6 +2573,21 @@ async function startServer() {
     }
   });
 
+  // Define daily automatic cron job for postos and tancagem to execute at 2:00 AM local time
+  cron.schedule("0 2 * * *", async () => {
+    console.log("[CRON] Executando Sincronização Automática Diária de Postos e Tancagem ANP às", new Date().toLocaleString());
+    try {
+      const result = await runAnpTancagemSync();
+      if (result.success) {
+        console.log("[CRON] Sincronização Automática Diária de Postos e Tancagem ANP finalizada com sucesso!", JSON.stringify(result.stats));
+      } else {
+        console.error("[CRON] Sincronização Automática Diária de Postos e Tancagem ANP falhou:", result.error);
+      }
+    } catch (err: any) {
+      console.error("[CRON] Erro inesperado na Sincronização Automática Diária de Postos e Tancagem ANP:", err.message);
+    }
+  });
+
   app.all("/api/admin/sync-anp-prices", async (req, res) => {
     const syncKeyHeader = req.headers["x-sync-key"];
     const expectedSyncKey = process.env.SYNC_KEY || "enche-o-tanque-sync-key";
@@ -2389,6 +2630,54 @@ async function startServer() {
         error: error.message || "Erro desconhecido ao executar script de sincronização",
         output: error.stdout || "",
         warnings: error.stderr || ""
+      });
+    }
+  });
+
+  app.all("/api/admin/sync-anp-tancagem", async (req, res) => {
+    const syncKeyHeader = req.headers["x-sync-key"];
+    const expectedSyncKey = process.env.SYNC_KEY || "enche-o-tanque-sync-key";
+
+    let isAuthorized = false;
+
+    if (syncKeyHeader && syncKeyHeader === expectedSyncKey) {
+      isAuthorized = true;
+    } else {
+      const token = req.cookies.session;
+      if (token) {
+        try {
+          const decoded: any = jwt.verify(token, JWT_SECRET);
+          const isAdmin = await checkIsAdmin(decoded.email);
+          if (isAdmin) {
+            isAuthorized = true;
+          }
+        } catch (e) {
+          // Token invalid
+        }
+      }
+    }
+
+    if (!isAuthorized) {
+      return res.status(401).json({ error: "Unauthorized. For cron, provide X-Sync-Key header." });
+    }
+
+    try {
+      const dryRun = req.query.dryRun === "true" || req.body?.dryRun === true;
+      console.log(`[WEB_API] Executando sincronização manual on-demand de postos e tancagem (dryRun: ${dryRun})...`);
+      const result = await runAnpTancagemSync(dryRun);
+      res.json({
+        success: result.success,
+        message: result.success 
+          ? (dryRun ? "Simulação de Sincronização executada com sucesso! (Nenhum dado alterado)" : "Sincronização de Postos e Tancagem executada com sucesso!") 
+          : "Sincronização concluída com erros ou pendências.",
+        stats: result.stats,
+        error: result.error || null
+      });
+    } catch (error: any) {
+      console.error("[WEB_API] Error during manual ANP Tancagem Sync:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Erro desconhecido ao executar sincronização de tancagem"
       });
     }
   });

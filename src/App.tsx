@@ -30,6 +30,7 @@ import {
   Home as HomeIcon,
   Navigation,
   Share2,
+  Share,
   Map as MapIcon,
   Fuel,
   Star,
@@ -58,7 +59,11 @@ import {
   Building2,
   AlertCircle,
   FileText,
-  BarChart2
+  BarChart2,
+  Flag,
+  Coins,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import React, { useState, ReactNode, useEffect, useRef, useCallback, useMemo } from "react";
 import { Html5Qrcode } from "html5-qrcode";
@@ -151,6 +156,8 @@ export default function App() {
   const [permissionError, setPermissionError] = useState(false);
   const [canInstallPWA, setCanInstallPWA] = useState(false);
   const [isIosUser, setIsIosUser] = useState(false);
+  const [showIosInstallGuide, setShowIosInstallGuide] = useState(false);
+  const [showIosBanner, setShowIosBanner] = useState(false);
   const [isUpdatingPWA, setIsUpdatingPWA] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   
@@ -188,7 +195,7 @@ export default function App() {
     const initialize = async () => {
       // 1. PWA Update Detection (Immediate)
       if ('serviceWorker' in navigator) {
-        // Força verificação de atualização ao iniciar para garantir que o PWA receba a v1.9.0
+        // Força verificação de atualização ao iniciar para garantir que o PWA receba a v2.2.0
         const hadController = !!navigator.serviceWorker.controller;
         
         navigator.serviceWorker.getRegistration().then(reg => {
@@ -276,6 +283,9 @@ export default function App() {
     const isIos = /iphone|ipad|ipod/.test(ua);
     const isStandalone = (window.navigator as any).standalone === true;
     setIsIosUser(isIos && !isStandalone);
+    if (isIos && !isStandalone && localStorage.getItem('dismissed_ios_banner') !== 'true') {
+      setShowIosBanner(true);
+    }
 
     return () => {
       clearInterval(progressInterval);
@@ -382,7 +392,7 @@ export default function App() {
 
       // 2. Changelog Automático (Apenas 1x após tudo estar estável e usuário logado e NÃO estiver atualizando PWA)
       if (user && !isUpdatingPWA) {
-        const CURRENT_VERSION = '1.9.0';
+        const CURRENT_VERSION = '2.2.0';
         const lastSeenVersion = localStorage.getItem('last_seen_version');
         const isDev = import.meta.env.DEV;
         
@@ -1334,7 +1344,7 @@ export default function App() {
                   <span className="text-white">Enche o </span>
                   <span className="text-amber-400">Tanque</span>
                 </h1>
-                <span className="text-[8px] font-black text-primary/50 uppercase">PWA v1.9.0</span>
+                <span className="text-[8px] font-black text-primary/50 uppercase">PWA v2.2.0</span>
               </div>
               <p className="text-[8px] text-white/50 uppercase font-bold tracking-widest mt-1">Ambiente de Testes / Homologação</p>
             </div>
@@ -1471,7 +1481,7 @@ export default function App() {
             </p>
             <div className="pt-2">
               <span className="text-[9px] font-black text-primary/50 uppercase tracking-[0.2em] border border-primary/20 px-3 py-1 rounded-full bg-primary/5 backdrop-blur-sm">
-                v1.9.0
+                v2.2.0
               </span>
             </div>
           </div>
@@ -1722,11 +1732,65 @@ export default function App() {
               </div>
 
               <div className="flex-grow overflow-y-auto p-6 space-y-8 custom-scrollbar">
-                {/* 30/05/2026 - Item 1.9.0 */}
+                {/* 11/06/2026 - Item 2.2.0 */}
                 <div className="space-y-3 relative pl-6 border-l-2 border-primary">
                   <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary shadow-[0_0_10px_rgba(204,255,0,0.8)]" />
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-primary uppercase tracking-widest">v1.9.0</span>
+                    <span className="text-xs font-black text-primary uppercase tracking-widest">v2.2.0</span>
+                    <span className="text-[10px] font-bold text-white/30 uppercase">11/06/2026</span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="inline-block px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-tighter mb-1">NOVIDADE: ESTRUTURA DE TANCAGEM & AUDITORIA</span>
+                    <p className="text-sm font-bold text-white">Sincronização Avançada da Tancagem ANP</p>
+                    <ul className="text-xs text-on-surface-variant opacity-70 leading-relaxed list-disc pl-4 space-y-1">
+                      <li>⚙️ Sincronizador de Tancagem: Sincronização diária estrutural da matriz de tancagem e bicos oficiais das distribuidoras direto da ANP API.</li>
+                      <li>🔔 Decomissionamento de Combustíveis: Remoção/ativação inteligente de combustíveis com base no andamento operacional da ANP.</li>
+                      <li>📑 Logs de Auditoria & Notificações: Logs permanentes de transações de sincronização com disparos informativos aos admins.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* 11/06/2026 - Item 2.1.0 */}
+                <div className="space-y-3 relative pl-6 border-l-2 border-primary/40">
+                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary/40 border border-primary" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-primary/60 uppercase tracking-widest">v2.1.0</span>
+                    <span className="text-[10px] font-bold text-white/30 uppercase">11/06/2026</span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="inline-block px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-tighter mb-1">NOVIDADE: FALE CONOSCO IA & ACESSIBILIDADE</span>
+                    <p className="text-sm font-bold text-white/80">IA e Confirmações Personalizadas</p>
+                    <ul className="text-xs text-on-surface-variant opacity-60 leading-relaxed list-disc pl-4 space-y-1">
+                     <li>📬 Confirmação Recebimento: Usuários agora recebem notificações automáticas legíveis, elegantes e bem estruturadas.</li>
+                      <li>👁️ Acessibilidade & Contraste: Layout de e-mail redesenhado com tons esmeralda de excelente contraste e legibilidade.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* 11/06/2026 - Item 2.0.0 */}
+                <div className="space-y-3 relative pl-6 border-l-2 border-primary/40">
+                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary/40 border border-primary" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-primary/60 uppercase tracking-widest">v2.0.0</span>
+                    <span className="text-[10px] font-bold text-white/30 uppercase">11/06/2026</span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="inline-block px-2 py-0.5 rounded bg-primary/20 text-primary text-[9px] font-black uppercase tracking-tighter mb-1">NOVIDADE: MAPAS & ESTIMATIVAS</span>
+                    <p className="text-sm font-bold text-white/80">Filtros Inteligentes de Bandeiras</p>
+                    <ul className="text-xs text-on-surface-variant opacity-60 leading-relaxed list-disc pl-4 space-y-1">
+                      <li>🏷️ Preços Direto no Mapa: Assista aos valores de preços de combustíveis de cada posto direto na marcação do mapa de cobertura.</li>
+                      <li>🗂️ Identificação por Bandeiras: Filtre instantaneamente as localizações no mapa pelas bandeiras de sua preferência.</li>
+                      <li>📈 Economia Personalizada & Média Municipal: Novo indicador de potencial de economia, além do preço médio local em destaque.</li>
+                      <li>📸 Instagram Integrado: Perfil no Instagram ativado.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* 30/05/2026 - Item 1.9.0 */}
+                <div className="space-y-3 relative pl-6 border-l-2 border-primary/40">
+                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary/40 border border-primary" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-primary/60 uppercase tracking-widest">v1.9.0</span>
                     <span className="text-[10px] font-bold text-white/30 uppercase">30/05/2026</span>
                   </div>
                   <div className="space-y-1">
@@ -2078,6 +2142,134 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* iOS Install Guide Modal */}
+      <AnimatePresence>
+        {showIosInstallGuide && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[130] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 30 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 30 }}
+              className="bg-surface-container-highest w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 flex flex-col p-6 text-center text-white"
+            >
+              <div className="flex justify-end">
+                <button 
+                  onClick={() => setShowIosInstallGuide(false)}
+                  className="p-1.5 bg-white/5 hover:bg-white/10 text-white/40 hover:text-white rounded-full transition-all"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex flex-col items-center mt-2 mb-6">
+                <div className="w-16 h-16 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center mb-4">
+                  <img src="/Logo_maker_project.png" className="w-12 h-12 rounded-xl" alt="Logo" />
+                </div>
+                <h3 className="text-xl font-black uppercase tracking-tight text-white mb-2">Instalar Enche o Tanque</h3>
+                <p className="text-xs text-white/60 max-w-xs leading-relaxed">
+                  Adicione o app à sua tela de início para acesso rápido, scanner otimizado e uma experiência fluida sem barras de navegação!
+                </p>
+              </div>
+
+              {/* Steps */}
+              <div className="space-y-4 text-left bg-black/20 p-5 rounded-2xl border border-white/5 mb-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary text-black flex items-center justify-center font-black text-xs shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white uppercase tracking-wider mb-1">Abra no Safari</p>
+                    <p className="text-[11px] text-white/65">
+                      Garantia de conformidade PWA. Se você estiver usando outro navegador (como Google Chrome no iOS), abra o link pelo navegador nativo <span className="text-primary font-bold">Safari</span>.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary text-black flex items-center justify-center font-black text-xs shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white uppercase tracking-wider mb-1">Toque em Compartilhar</p>
+                    <p className="text-[11px] text-white/65 flex items-center gap-1.5 flex-wrap">
+                      Toque no ícone de <span className="bg-white/10 relative bottom-0.5 inline-flex items-center justify-center p-1 rounded-md text-white font-bold"><Share size={12} className="text-blue-400 stroke-[2.5]" /></span> (Compartilhar) na barra do seu navegador.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary text-black flex items-center justify-center font-black text-xs shrink-0 mt-0.5">
+                    3
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white uppercase tracking-wider mb-1">Adicionar à Tela de Início</p>
+                    <p className="text-[11px] text-white/65 flex items-center gap-1.5 flex-wrap">
+                      Role o menu para baixo e selecione a opção <span className="text-primary font-bold">Adicionar à Tela de Início</span> <span className="bg-white/10 relative bottom-0.5 inline-flex items-center justify-center p-1 rounded-md text-white font-bold"><Plus size={12} /></span>.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => setShowIosInstallGuide(false)}
+                className="w-full bg-[#ccff00] text-black font-black py-4 rounded-xl uppercase tracking-widest text-[11px] hover:bg-[#d8ff33] active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(204,255,0,0.25)]"
+              >
+                Entendi, vamos lá!
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* iOS Smart Banner Bottom Pop-up */}
+      <AnimatePresence>
+        {showIosBanner && (
+          <motion.div 
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            className="fixed bottom-4 left-4 right-4 z-[99] max-w-md mx-auto bg-surface-container-highest border border-white/10 rounded-[2rem] p-4 shadow-2xl backdrop-blur-xl flex items-center gap-4 text-white"
+          >
+            <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center shrink-0">
+              <img src="/Logo_maker_project.png" className="w-10 h-10 rounded-lg" alt="Logo" />
+            </div>
+
+            <div className="flex-grow">
+              <h4 className="text-xs font-black uppercase tracking-wider text-white">Instale no seu iPhone</h4>
+              <p className="text-[10px] text-white/60 leading-normal mt-0.5">
+                Economize dados e acesse o scanner mais rápido adicionando à tela inicial.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-1 shrink-0">
+              <button 
+                onClick={() => {
+                  setShowIosInstallGuide(true);
+                  setShowIosBanner(false);
+                }}
+                className="px-3 py-1.5 bg-[#ccff00] text-black font-black uppercase tracking-wider text-[9px] rounded-lg active:scale-95 transition-transform"
+              >
+                Instalar
+              </button>
+              <button 
+                onClick={() => {
+                  localStorage.setItem('dismissed_ios_banner', 'true');
+                  setShowIosBanner(false);
+                }}
+                className="px-3 py-1 text-white/40 hover:text-white font-black uppercase tracking-wider text-[8px] rounded-lg transition-colors"
+              >
+                Ignorar
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Auto-association Toast/Message */}
       <AnimatePresence>
         {scanMessage && (
@@ -2171,7 +2363,7 @@ export default function App() {
                 <span className="text-white">Enche o </span>
                 <span className="text-amber-400">Tanque</span>
               </h1>
-              <span className="text-[8px] font-black text-primary/50 leading-none">v1.9.0</span>
+              <span className="text-[8px] font-black text-primary/50 leading-none">v2.2.0</span>
             </div>
             <p className="text-[7px] text-white/60 uppercase font-bold tracking-widest leading-none">
               Abasteça com inteligência
@@ -2186,6 +2378,19 @@ export default function App() {
               animate={{ scale: 1, rotate: 0 }}
               whileTap={{ scale: 0.9 }}
               onClick={(e) => { e.stopPropagation(); handlePWAInstall(); }}
+              className="bg-primary text-black px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-[0_0_20px_rgba(204,255,0,0.3)] border border-primary/50 group"
+            >
+              <Plus size={14} className="group-hover:rotate-90 transition-transform" />
+              <span className="text-[10px] font-black uppercase tracking-tighter hidden sm:inline">Instalar App</span>
+            </motion.button>
+          )}
+
+          {isIosUser && (
+            <motion.button 
+              initial={{ scale: 0, rotate: -20 }}
+              animate={{ scale: 1, rotate: 0 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={(e) => { e.stopPropagation(); setShowIosInstallGuide(true); }}
               className="bg-primary text-black px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-[0_0_20px_rgba(204,255,0,0.3)] border border-primary/50 group"
             >
               <Plus size={14} className="group-hover:rotate-90 transition-transform" />
@@ -2260,9 +2465,16 @@ export default function App() {
                       </button>
                     )}
 
-                    {canInstallPWA && (
+                    {(canInstallPWA || isIosUser) && (
                       <button 
-                        onClick={() => { handlePWAInstall(); setShowProfileMenu(false); }}
+                        onClick={() => { 
+                          if (isIosUser) {
+                            setShowIosInstallGuide(true);
+                          } else {
+                            handlePWAInstall();
+                          }
+                          setShowProfileMenu(false); 
+                        }}
                         className="w-full text-left px-4 py-3 rounded-xl bg-primary/10 hover:bg-primary/20 flex items-center gap-3 transition-all text-primary group border border-primary/20"
                       >
                         <Plus size={18} className="text-primary" />
@@ -3867,7 +4079,7 @@ function ProfileView({ user, onLogin, onLogout, vehicles, selectedVehicle, onSel
                   Termos de Uso
                 </button>
               </div>
-              <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/10">v1.9.0 • Enche o Tanque</p>
+              <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/10">v2.2.0 • Enche o Tanque</p>
             </div>
           </>
         )}
@@ -4681,6 +4893,171 @@ function HistoryView({ selectedVehicle }: { selectedVehicle: any }) {
   );
 }
 
+const BRAND_OPTIONS = [
+  {
+    id: 'petrobras',
+    label: 'Petrobras',
+    svg: (
+      <svg viewBox="9 5 22 22" className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 p-0.5">
+        <defs>
+          <clipPath id="br-circle-clip-filter">
+            <circle cx="20" cy="16" r="11" />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#br-circle-clip-filter)">
+          <rect x="9" y="5" width="22" height="22" fill="#ffffff" />
+          <g transform="translate(-1.6, -0.65) scale(0.225)">
+            <path fill="#ffffff" d="M56.019 34.929h79.449v79.292H56.019V34.929z"/>
+            <path fill="#ffd100" d="M135.859 53.43H56.527V34.073h79.332V53.43z"/>
+            <path fill="#008c45" d="M56.68 64.002h79.299v50.387H56.68V64.002z"/>
+            <path d="M63.838 93.146l8.361-29.21 14.412-.089c9.731-.164 11.952 8.897 4.471 14.471 6.334 3.904 2.206 15.067-7.958 14.873l-19.286-.045zM96.435 93.295l8.331-29.448 14.933-.089c10.939-.134 10.671 12.742 1.49 16.378 2.087.477 2.803 1.818 2.966 3.502l.492 9.836h-7.974l-.446-8.644c.044-1.55-.835-2.534-3.309-2.608l-4.919-.015-2.965 11.088h-8.599z" fill="#ffffff"/>
+            <path d="M77.604 75.124l1.401-5.484h7.064c3.249.7 2.549 5.111-1.117 5.469l-7.348.015zM74.189 87.128l1.891-6.319h7.247c3.275.807 2.192 5.89-1.598 6.302l-7.54.017zM109.487 76.356l1.82-6.56h7.249c3.312.807 2.198 6.13-1.634 6.542l-7.435.018z" fill="#008c45"/>
+          </g>
+        </g>
+        <circle cx="20" cy="16" r="11" fill="none" stroke="#ffffff" strokeWidth={0.3} opacity="0.8" />
+      </svg>
+    )
+  },
+  {
+    id: 'shell',
+    label: 'Shell',
+    svg: (
+      <svg viewBox="9 5 22 22" className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 p-0.5">
+        <defs>
+          <clipPath id="shell-circle-clip-filter">
+            <circle cx="20" cy="16" r="11" />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#shell-circle-clip-filter)">
+          <rect x="9" y="5" width="22" height="22" fill="#ffffff" />
+          <image 
+            href="/shell.png" 
+            x="11" 
+            y="7" 
+            width="18" 
+            height="18" 
+            preserveAspectRatio="xMidYMid meet"
+          />
+        </g>
+        <circle cx="20" cy="16" r="11" fill="none" stroke="#ffffff" strokeWidth={0.3} opacity="0.8" />
+      </svg>
+    )
+  },
+  {
+    id: 'ipiranga',
+    label: 'Ipiranga',
+    svg: (
+      <svg viewBox="9 5 22 22" className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 p-0.5">
+        <defs>
+          <clipPath id="ipiranga-circle-clip-filter">
+            <circle cx="20" cy="16" r="11" />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#ipiranga-circle-clip-filter)">
+          <rect x="9" y="5" width="22" height="22" fill="#F8CD1C" />
+          <g transform="translate(10.8, 6.8) scale(0.184)">
+            <path d="M76.5,26.5 C76.5,26.5 40,25 25,48 C16.5,61 24,73.5 24,73.5 C24,73.5 40.5,58.5 53.5,49 L55,73 C55,75 57,75 59,74 C69.5,68.5 76.5,55 76.5,41 V26.5 Z" fill="#005CBB" />
+            <polygon points="51,32 68.5,32 55.5,46" fill="#F8CD1C" stroke="#F8CD1C" strokeWidth={1.2} strokeLinejoin="round" />
+          </g>
+        </g>
+        <circle cx="20" cy="16" r="11" fill="none" stroke="#ffffff" strokeWidth={0.3} opacity="0.8" />
+      </svg>
+    )
+  },
+  {
+    id: 'ale',
+    label: 'ALE',
+    svg: (
+      <svg viewBox="9 5 22 22" className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 p-0.5">
+        <circle cx="20" cy="16" r="11" fill="#00529B" />
+        <path d="M 13.5 21 L 17.5 11.2 L 20 11.2 L 16.5 21 Z" fill="#FFFFFF" />
+        <path d="M 18.5 11.2 L 21 11.2 L 25 21 L 22 21 Z" fill="#ED1C24" />
+        <rect x="15" y="16.5" width="6.5" height="1.8" fill="#FFFFFF" />
+      </svg>
+    )
+  },
+  {
+    id: 'branca',
+    label: 'Branca',
+    svg: (
+      <svg viewBox="9 5 22 22" className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 p-0.5">
+        <circle cx="20" cy="16" r="11" fill="#FFFFFF" stroke="#475569" strokeWidth={1} />
+        <text x="20" y="15" fontFamily="'Helvetica Neue', Arial, sans-serif" fontWeight="900" fontSize="5.5px" fill="#1e293b" textAnchor="middle">BAND.</text>
+        <text x="20" y="21" fontFamily="'Helvetica Neue', Arial, sans-serif" fontWeight="900" fontSize="5.5px" fill="#1e293b" textAnchor="middle">BRANCA</text>
+      </svg>
+    )
+  },
+  {
+    id: 'nexta',
+    label: 'Nexta',
+    svg: (
+      <svg viewBox="9 5 22 22" className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 p-0.5">
+        <path d="M 20 5 A 11 11 0 0 0 20 27 Z" fill="#00A19C" />
+        <path d="M 16.5 13 C 14.5 15, 13.5 17, 13.5 18 A 2.5 2.5 0 0 0 18.5 18 C 18.5 17, 18.5 15, 16.5 13 Z" fill="none" stroke="#FFFFFF" strokeWidth={1.2} strokeLinejoin="round" />
+        <circle cx="16.5" cy="18" r="0.8" fill="#FFFFFF" />
+        <path d="M 20 5 A 11 11 0 0 1 20 27 Z" fill="#FFFFFF" />
+        <path d="M 20.5 14 Q 23.5 11, 26 13 Q 28 15, 25 18 T 20.5 19.5" fill="none" stroke="#ED1C24" strokeWidth={1.2} strokeLinecap="round" />
+        <path d="M 23 16 Q 22 19, 21.5 21.5 Q 23.5 23.5, 25 21" fill="none" stroke="#00529B" strokeWidth={1} strokeLinecap="round" />
+        <path d="M 21.5 17 Q 24.5 20, 25 23" fill="none" stroke="#FFBF00" strokeWidth={0.8} />
+      </svg>
+    )
+  },
+  {
+    id: 'petrobrasil',
+    label: 'Petrobrasil',
+    svg: (
+      <svg viewBox="9 5 22 22" className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 p-0.5">
+        <circle cx="20" cy="16" r="11" fill="#1b5e20" />
+        <path d="M 20 9.5 C 17 13.5, 16.2 15.5, 16.2 17.5 A 3.8 3.8 0 0 0 23.8 17.5 C 23.8 15.5, 23 13.5, 20 9.5 Z" fill="#fbc02d" />
+        <text x="20" y="19" fontFamily="'Arial Black', sans-serif" fontWeight="950" fontSize="5px" fill="#1b5e20" textAnchor="middle">PB</text>
+      </svg>
+    )
+  },
+  {
+    id: 'outras',
+    label: 'Outras',
+    svg: (
+      <svg viewBox="9 5 22 22" className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 p-0.5">
+        <circle cx="20" cy="16" r="11" fill="#1e293b" />
+        <g transform="translate(13.5, 9.5) scale(0.65)">
+          <path d="M12,4.5 h2.5 c1.7,0,3.5,1.5,3.5,3.5 v0.5 c0,2,-1.8,3.5,-3.5,3.5 h-2.5" fill="none" stroke="#fbbf24" strokeWidth={2} />
+          <path d="M12,10.5 l3,-1.8" fill="none" stroke="#fbbf24" strokeWidth={1.5} strokeLinecap="round" />
+          <rect x="4" y="3" width="8" height="9" rx="2" fill="#fbbf24" />
+          <rect x="2" y="4.5" width="2" height="5" rx="0.5" fill="#fbbf24" />
+          <path d="M3,7 C 0.5,7 -1.5,9 -1.5,12.5" fill="none" stroke="#fbbf24" strokeWidth={2} strokeLinecap="round" />
+          <circle cx="-1.5" cy="16" r="1.5" fill="#fbbf24" />
+        </g>
+      </svg>
+    )
+  }
+];
+
+function getStationBrandSvg(brandName: string) {
+  const brand = (brandName || '').toLowerCase().trim();
+  if (brand.includes('branca') || brand.includes('sem bandeira') || brand === '' || brand.includes('independente')) {
+    return BRAND_OPTIONS.find(b => b.id === 'branca')?.svg;
+  }
+  if (!brand.includes('petrobrasil') && (brand.includes('petrobras') || brand.includes('vibra') || brand === 'br' || brand.startsWith('br ') || brand.endsWith(' br') || brand.includes(' br '))) {
+    return BRAND_OPTIONS.find(b => b.id === 'petrobras')?.svg;
+  }
+  if (brand.includes('shell') || brand.includes('raizen')) {
+    return BRAND_OPTIONS.find(b => b.id === 'shell')?.svg;
+  }
+  if (brand.includes('ipiranga')) {
+    return BRAND_OPTIONS.find(b => b.id === 'ipiranga')?.svg;
+  }
+  if (brand.includes('ale')) {
+    return BRAND_OPTIONS.find(b => b.id === 'ale')?.svg;
+  }
+  if (brand.includes('nexta')) {
+    return BRAND_OPTIONS.find(b => b.id === 'nexta')?.svg;
+  }
+  if (brand.includes('petrobrasil')) {
+    return BRAND_OPTIONS.find(b => b.id === 'petrobrasil')?.svg;
+  }
+  return BRAND_OPTIONS.find(b => b.id === 'outras')?.svg;
+}
+
 function SearchFuelView({ 
   user, 
   selectedVehicle, 
@@ -4710,11 +5087,67 @@ function SearchFuelView({
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [loadingFuels, setLoadingFuels] = useState(fuelTypes.length === 0);
   const [gasStations, setGasStations] = useState<any[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+
+  const filteredStations = useMemo(() => {
+    if (selectedBrands.length === 0) return gasStations;
+    return gasStations.filter(station => {
+      const brand = (station.nm_bandeira || '').toLowerCase().trim();
+      return selectedBrands.some(sel => {
+        const s = sel.toLowerCase();
+        if (s === 'branca') {
+          return brand.includes('branca') || brand.includes('sem bandeira') || brand === '' || brand.includes('independente');
+        }
+        if (s === 'petrobras') {
+          if (brand.includes('petrobrasil')) return false;
+          if (brand.includes('branca') || brand.includes('sem bandeira') || brand === '' || brand.includes('independente')) return false;
+          return brand.includes('petrobras') || brand.includes('vibra') || brand === 'br' || brand.startsWith('br ') || brand.endsWith(' br') || brand.includes(' br ');
+        }
+        if (s === 'shell') {
+          return brand.includes('shell') || brand.includes('raizen');
+        }
+        if (s === 'ipiranga') {
+          return brand.includes('ipiranga');
+        }
+        if (s === 'ale') {
+          return brand.includes('ale');
+        }
+        if (s === 'nexta') {
+          return brand.includes('nexta');
+        }
+        if (s === 'petrobrasil') {
+          return brand.includes('petrobrasil');
+        }
+        if (s === 'outras') {
+          const isPetrobras = !brand.includes('petrobrasil') && 
+                              !(brand.includes('branca') || brand.includes('sem bandeira') || brand === '' || brand.includes('independente')) &&
+                              (brand.includes('petrobras') || brand.includes('vibra') || brand === 'br' || brand.startsWith('br ') || brand.endsWith(' br') || brand.includes(' br '));
+
+          const isKnown = brand.includes('branca') || brand.includes('sem bandeira') || brand === '' || brand.includes('independente') ||
+                          isPetrobras ||
+                          brand.includes('shell') || brand.includes('raizen') ||
+                          brand.includes('ipiranga') ||
+                          brand.includes('ale') ||
+                          brand.includes('nexta') ||
+                          brand.includes('petrobrasil');
+          return !isKnown;
+        }
+        return brand.includes(s);
+      });
+    });
+  }, [gasStations, selectedBrands]);
+
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [mapAuthError, setMapAuthError] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [selectedStation, setSelectedStation] = useState<any>(null);
+
+  useEffect(() => {
+    if (selectedStation && !filteredStations.some(s => s.nm_posto === selectedStation.nm_posto)) {
+      setSelectedStation(null);
+    }
+  }, [filteredStations, selectedStation]);
   const circleRef = useRef<google.maps.Circle | null>(null);
   const concentricCirclesRef = useRef<google.maps.Circle[]>([]);
   const concentricLabelsRef = useRef<google.maps.Marker[]>([]);
@@ -4901,7 +5334,7 @@ function SearchFuelView({
     concentricLabelsRef.current = labels;
 
     // ACTIVE RADAR STATE (Triggered after a successful "BUSCAR" filter)
-    if (gasStations.length > 0) {
+    if (filteredStations.length > 0) {
       // Initialize multiple gradient wedge sectors (Degradê)
       const numSectors = 15;
       const sectorWidth = 2.5; // total spread of 37.5 degrees
@@ -4974,7 +5407,7 @@ function SearchFuelView({
       radarSweepPolygonsRef.current.forEach(p => p.setMap(null));
       radarSweepPolygonsRef.current = [];
     };
-  }, [mapInstance, userLocation, radius, gasStations.length]);
+  }, [mapInstance, userLocation, radius, filteredStations.length]);
 
   useEffect(() => {
     return () => {
@@ -5160,14 +5593,161 @@ function SearchFuelView({
               />
             )}
             {(() => {
-              const allPrices = gasStations
+              const allPrices = filteredStations
                 .map(s => parseFloat(s.price))
                 .filter(p => !isNaN(p) && p > 0);
               const minPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
               const maxPrice = allPrices.length > 0 ? Math.max(...allPrices) : 0;
               const avgPrice = allPrices.length > 0 ? allPrices.reduce((a, b) => a + b, 0) / allPrices.length : 0;
 
-              return gasStations.map((station, i) => {
+              // Helper for brand-specific styles and vector logos
+              const getBrandVisuals = (bandeira: string, pinBg: string) => {
+                const brand = (bandeira || '').toLowerCase().trim();
+
+                // 1. BANDEIRA BRANCA
+                const isBandeiraBranca = brand.includes('branca') || brand.includes('sem bandeira') || brand === '' || brand.includes('independente');
+                if (isBandeiraBranca) {
+                  return {
+                    pinColor: '#e2e8f0', // Clean slate/grayish white pin boundary
+                    logo: `<!-- Bandeira Branca written cleanly inside white circle -->
+                      <circle cx="20" cy="16" r="11" fill="#FFFFFF" stroke="#475569" stroke-width="1" />
+                      <text x="20" y="15" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="5.5px" fill="#1e293b" text-anchor="middle">BAND.</text>
+                      <text x="20" y="21" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="5.5px" fill="#1e293b" text-anchor="middle">BRANCA</text>`
+                  };
+                }
+
+                // 2. NEXTA (Half Petronas, Half TotalEnergies split pin!)
+                if (brand.includes('nexta')) {
+                  return {
+                    pinColor: '#0f172a', // Sleek dark slate pin frame to hold the split colors
+                    logo: `<!-- NEXTA split icon: Left Petronas (Teal), Right TotalEnergies (Split White/Colors) -->
+                      <!-- Left side: Petronas -->
+                      <path d="M 20 5 A 11 11 0 0 0 20 27 Z" fill="#00A19C" />
+                      <!-- Petronas white drop -->
+                      <path d="M 16.5 13 C 14.5 15, 13.5 17, 13.5 18 A 2.5 2.5 0 0 0 18.5 18 C 18.5 17, 18.5 15, 16.5 13 Z" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linejoin="round" />
+                      <circle cx="16.5" cy="18" r="0.8" fill="#FFFFFF" />
+
+                      <!-- Right side: TotalEnergies background -->
+                      <path d="M 20 5 A 11 11 0 0 1 20 27 Z" fill="#FFFFFF" />
+                      <!-- TotalEnergies stylized colored curves -->
+                      <path d="M 20.5 14 Q 23.5 11, 26 13 Q 28 15, 25 18 T 20.5 19.5" fill="none" stroke="#ED1C24" stroke-width="1.2" stroke-linecap="round" />
+                      <path d="M 23 16 Q 22 19, 21.5 21.5 Q 23.5 23.5, 25 21" fill="none" stroke="#00529B" stroke-width="1" stroke-linecap="round" />
+                      <path d="M 21.5 17 Q 24.5 20, 25 23" fill="none" stroke="#FFBF00" stroke-width="0.8" />`
+                  };
+                }
+
+                // 3. PETROBRASIL (Independente, green & yellow, NO official BR logo) - MUST be checked before general petrobras/br
+                if (brand.includes('petrobrasil')) {
+                  return {
+                    pinColor: '#1b5e20', // Green pin
+                    logo: `<!-- Petrobrasil Green and Yellow Fuel Drop illustration with 'PB' -->
+                      <circle cx="20" cy="16" r="11" fill="#1b5e20" />
+                      <path d="M 20 9.5 C 17 13.5, 16.2 15.5, 16.2 17.5 A 3.8 3.8 0 0 0 23.8 17.5 C 23.8 15.5, 23 13.5, 20 9.5 Z" fill="#fbc02d" />
+                      <text x="20" y="19" font-family="'Arial Black', sans-serif" font-weight="950" font-size="5px" fill="#1b5e20" text-anchor="middle">PB</text>`
+                  };
+                }
+
+                // 4. VIBRA / PETROBRAS (Official BR brand distribution)
+                if (brand.includes('petrobras') || brand.includes('br') || brand.includes('vibra')) {
+                  return {
+                    pinColor: '#008c45',
+                    logo: `<defs>
+                        <clipPath id="br-squircle-clip">
+                          <rect x="11" y="7" width="18" height="18" rx="4.5" />
+                        </clipPath>
+                      </defs>
+                      <g clip-path="url(#br-squircle-clip)">
+                        <g transform="translate(-1.6, -0.65) scale(0.225)">
+                          <!-- White background from original SVG -->
+                          <path fill="#ffffff" d="M56.019 34.929h79.449v79.292H56.019V34.929z"/>
+                          <!-- Yellow top band from original SVG -->
+                          <path fill="#ffd100" d="M135.859 53.43H56.527V34.073h79.332V53.43z"/>
+                          <!-- Green bottom band from original SVG -->
+                          <path fill="#008c45" d="M56.68 64.002h79.299v50.387H56.68V64.002z"/>
+                          <!-- Letters 'BR' from original SVG -->
+                          <path d="M63.838 93.146l8.361-29.21 14.412-.089c9.731-.164 11.952 8.897 4.471 14.471 6.334 3.904 2.206 15.067-7.958 14.873l-19.286-.045zM96.435 93.295l8.331-29.448 14.933-.089c10.939-.134 10.671 12.742 1.49 16.378 2.087.477 2.803 1.818 2.966 3.502l.492 9.836h-7.974l-.446-8.644c.044-1.55-.835-2.534-3.309-2.608l-4.919-.015-2.965 11.088h-8.599z" fill="#ffffff"/>
+                          <!-- Inside holes of letters 'BR' from original SVG -->
+                          <path d="M77.604 75.124l1.401-5.484h7.064c3.249.7 2.549 5.111-1.117 5.469l-7.348.015zM74.189 87.128l1.891-6.319h7.247c3.275.807 2.192 5.89-1.598 6.302l-7.54.017zM109.487 76.356l1.82-6.56h7.249c3.312.807 2.198 6.13-1.634 6.542l-7.435.018z" fill="#008c45"/>
+                        </g>
+                      </g>
+                      <rect x="11" y="7" width="18" height="18" rx="4.5" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.8" />`
+                  };
+                }
+
+                // 5. RAIZEN / SHELL (Raizen distributes under Shell brand in Brazil)
+                if (brand.includes('shell') || brand.includes('raizen')) {
+                  return {
+                    pinColor: '#ed1c24', // Shell Red
+                    logo: `<defs>
+                        <clipPath id="shell-squircle-clip">
+                          <rect x="11" y="7" width="18" height="18" rx="4.5" />
+                        </clipPath>
+                      </defs>
+                      <g clip-path="url(#shell-squircle-clip)">
+                        <!-- White background inside squircle for high-contrast branding -->
+                        <rect x="11" y="7" width="18" height="18" fill="#ffffff" />
+                        <!-- Exact paths and style matching the newly uploaded shell.svg -->
+                        <g transform="translate(12.2, 8.8) scale(0.11)">
+                          <g transform="translate(-14.828488,-233.63904)">
+                            <g transform="matrix(0.2326949,0,0,0.2326949,0.4836773,190.36074)">
+                              <!-- Red Part -->
+                              <path d="M 355.02537,715.37104 C 335.03593,715.37104 324.76188,702.33533 324.76188,702.33533 C 308.33331,701.62104 179.94045,701.97818 179.94045,701.97818 L 167.44045,596.46933 C 167.44045,596.46933 88.360125,540.72818 81.931554,534.29961 C 43.972263,362.09404 181.17751,197.92475 355.03065,197.92475 C 528.88379,197.92475 666.08904,362.09404 628.12975,534.29961 C 621.70117,540.72818 542.62085,596.46933 542.62085,596.46933 L 530.12085,701.97818 C 530.12085,701.97818 401.72799,701.62104 385.29942,702.33533 C 385.29942,702.33533 375.02537,715.37104 355.02537,715.37104 z" fill="#ed1c24" />
+                              <!-- Yellow Part -->
+                              <path d="M 355.2112,554.91135 L 343.07983,250.34962 C 328.44892,247.36372 291.12518,250.94681 271.11966,265.8763 L 329.3447,556.10571 C 329.3447,556.10571 249.91977,277.8199 249.91977,277.8199 C 230.8796,277.58651 192.45851,309.78015 189.60461,319.3239 L 305.4575,566.25777 C 305.4575,566.25777 175.27229,340.52378 175.27229,340.52378 C 162.43292,345.30122 134.36547,396.95728 138.84432,402.95936 C 138.84432,402.95936 283.95903,580.59009 283.95903,580.59009 L 134.66406,428.9064 C 134.66406,428.9064 115.25571,458.46681 127.91248,508.53689 L 212.24117,569.43546 L 222.79862,652.63525 L 326.18883,652.63525 C 326.18883,652.63525 343.1038,668.66855 355.1056,668.66855 C 367.1074,668.66855 384.02237,652.63525 384.02237,652.63525 L 487.41258,652.63525 L 497.97003,569.43546 L 582.29872,508.53689 C 594.95549,458.46681 575.54714,428.9064 575.54714,428.9064 L 426.25217,580.59009 C 426.25217,580.59009 571.36688,402.95936 571.36688,402.95936 C 575.84573,396.95728 547.77828,345.30122 534.93891,340.52378 C 534.93891,340.52378 404.7537,566.25777 404.7537,566.25777 L 520.60659,319.3239 C 517.75269,309.78015 479.3316,277.58651 460.29143,277.8199 C 460.29143,277.8199 380.8665,556.10571 380.8665,556.10571 L 439.09154,265.8763 C 419.08602,250.94681 381.76228,247.36372 367.13137,250.34962 L 355.2112,554.91135 z" fill="#ffd500" />
+                            </g>
+                          </g>
+                        </g>
+                      </g>
+                      <rect x="11" y="7" width="18" height="18" rx="4.5" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.8" />`
+                  };
+                }
+
+                // 6. IPIRANGA (New organic blue 'i' shape with yellow triangle on yellow squircle)
+                if (brand.includes('ipiranga')) {
+                  return {
+                    pinColor: '#F8CD1C', // Brand Yellow
+                    logo: `<defs>
+                        <clipPath id="ipiranga-squircle-clip">
+                          <rect x="11" y="7" width="18" height="18" rx="4.5" />
+                        </clipPath>
+                      </defs>
+                      <g clip-path="url(#ipiranga-squircle-clip)">
+                        <!-- Solid Yellow background matching brand yellow -->
+                        <rect x="11" y="7" width="18" height="18" fill="#F8CD1C" />
+                        <!-- Organic brand design in high fidelity matching brand image -->
+                        <g transform="translate(10.8, 6.8) scale(0.184)">
+                          <!-- Blue Organic Main Shape -->
+                          <path d="M76.5,26.5 C76.5,26.5 40,25 25,48 C16.5,61 24,73.5 24,73.5 C24,73.5 40.5,58.5 53.5,49 L55,73 C55,75 57,75 59,74 C69.5,68.5 76.5,55 76.5,41 V26.5 Z" fill="#005CBB" />
+                          <!-- Yellow Triangular Dot Cutout -->
+                          <polygon points="51,32 68.5,32 55.5,46" fill="#F8CD1C" stroke="#F8CD1C" stroke-width="1.2" stroke-linejoin="round" />
+                        </g>
+                      </g>
+                      <rect x="11" y="7" width="18" height="18" rx="4.5" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.8" />`
+                  };
+                }
+
+                // 7. ALE (Blue badge, split white and red italic letter A)
+                if (brand.includes('ale')) {
+                  return {
+                    pinColor: '#ED1C24', // ALE Red pin
+                    logo: `<!-- Authentic ALE trademark split letter 'A' over blue circle -->
+                      <circle cx="20" cy="16" r="11" fill="#00529B" />
+                      <!-- Left white side of capital 'A' -->
+                      <path d="M 13.5 21 L 17.5 11.2 L 20 11.2 L 16.5 21 Z" fill="#FFFFFF" />
+                      <!-- Right red side of capital 'A' -->
+                      <path d="M 18.5 11.2 L 21 11.2 L 25 21 L 22 21 Z" fill="#ED1C24" />
+                      <rect x="15" y="16.5" width="6.5" height="1.8" fill="#FFFFFF" />`
+                  };
+                }
+
+                // Default / Outras bandeiras
+                return {
+                  pinColor: pinBg,
+                  logo: `<circle cx="20" cy="16" r="11" fill="#1e293b" /> <g transform="translate(13.5, 9.5) scale(0.65)"> <path d="M12,4.5 h2.5 c1.7,0,3.5,1.5,3.5,3.5 v0.5 c0,2,-1.8,3.5,-3.5,3.5 h-2.5" fill="none" stroke="${pinBg}" stroke-width="2" /> <path d="M12,10.5 l3,-1.8" fill="none" stroke="${pinBg}" stroke-width="1.5" stroke-linecap="round"/> <rect x="4" y="3" width="8" height="9" rx="2" fill="${pinBg}" /> <rect x="2" y="4.5" width="2" height="5" rx="0.5" fill="${pinBg}" /> <path d="M3,7 C 0.5,7 -1.5,9 -1.5,12.5" fill="none" stroke="${pinBg}" stroke-width="2" stroke-linecap="round" /> <circle cx="-1.5" cy="16" r="1.5" fill="${pinBg}" /> </g>`
+                };
+              };
+
+              return filteredStations.map((station, i) => {
                 const interpolateColor = (c1: number[], c2: number[], factor: number) => {
                   const result = c1.slice();
                   for (let i = 0; i < 3; i++) {
@@ -5197,15 +5777,50 @@ function SearchFuelView({
                 };
 
                 const pinBgColor = getPinColor(priceNum);
+                const brandVisuals = getBrandVisuals(station.nm_bandeira, pinBgColor);
                 
                 // Only format price if it exists
                 const priceStr = station.price ? `R$ ${formatNumber(priceNum, 3)}` : '';
+                const priceStrLabel = station.price ? `R$ ${formatNumber(priceNum, 2)}` : '';
                 const stationTitle = `${station.nm_posto}\n${priceStr}${isCheapest ? ' 🏆' : ''}`;
+                const showBalloon = !isNaN(priceNum) && priceNum > 0;
 
-                let svgExtra = '';
-                if (isCheapest) {
-                   svgExtra = `<circle cx="30" cy="8" r="8" fill="#1e1e1e" stroke="#ccff00" stroke-width="1.5"/><text x="30" y="11" font-size="9" text-anchor="middle" font-family="sans-serif">🏆</text>`;
-                }
+                // Render dynamic SVG consisting of custom brand PIN and connected pricing balloon
+                const svgContent = `<svg width="${showBalloon ? 130 : 44}" height="44" viewBox="0 0 ${showBalloon ? 130 : 44} 44" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <filter id="shadow" x="-20%" y="-20%" width="150%" height="150%">
+                      <feDropShadow dx="1.5" dy="2.5" stdDeviation="2" flood-color="#000000" flood-opacity="0.35" />
+                    </filter>
+                    <style>
+                      @keyframes pulse-cheap {
+                        0% { stroke-width: 1.8px; stroke-opacity: 0.6; }
+                        50% { stroke-width: 3.5px; stroke-opacity: 1.0; }
+                        100% { stroke-width: 1.8px; stroke-opacity: 0.6; }
+                      }
+                      .blink-cheap {
+                        animation: pulse-cheap 1.4s infinite ease-in-out;
+                      }
+                    </style>
+                  </defs>
+                  
+                  <g filter="url(#shadow)">
+                    ${showBalloon ? `
+                      <!-- Pricing Balloon (White container with dynamic color borders matching price) -->
+                      <rect class="${isCheapest ? 'blink-cheap' : ''}" x="35" y="5" width="86" height="24" rx="12" fill="#ffffff" stroke="${pinBgColor}" stroke-width="${isCheapest ? '3' : '1.8'}" />
+                      <text x="78" y="21" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="950" font-size="11px" fill="#111111" text-anchor="middle">
+                        ${priceStrLabel} ${isCheapest ? '🏆' : ''}
+                      </text>
+                    ` : ''}
+                    
+                    <!-- Branded Map Pin with outer border coloring based on price colorimetry -->
+                    <g transform="translate(2, 0)">
+                      <path d="M20 0C11.16 0 4 7.16 4 16c0 10.33 16 24 16 24s16-13.67 16-24C36 7.16 28.84 0 20 0z" fill="${pinBgColor}"/>
+                      <path d="M20 2C12.27 2 6 8.27 6 16c0 8.01 11.23 19.38 14 21.93C22.77 35.38 34 24.01 34 16 34 8.27 27.73 2 20 2z" fill="#1e1e1e"/>
+                      <!-- Brand Logo / pump insert -->
+                      ${brandVisuals.logo}
+                    </g>
+                  </g>
+                </svg>`;
 
                 return (
                   <Marker 
@@ -5214,21 +5829,9 @@ function SearchFuelView({
                     title={stationTitle}
                     onClick={() => setSelectedStation(station)}
                     icon={{
-                      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-      <path d="M20 0C11.16 0 4 7.16 4 16c0 10.33 16 24 16 24s16-13.67 16-24C36 7.16 28.84 0 20 0z" fill="${pinBgColor}"/>
-      <path d="M20 2C12.27 2 6 8.27 6 16c0 8.01 11.23 19.38 14 21.93C22.77 35.38 34 24.01 34 16 34 8.27 27.73 2 20 2z" fill="#1e1e1e"/>
-      <g transform="translate(13, 6.5)">
-        <path d="M12,4.5 h2.5 c1.7,0,3.5,1.5,3.5,3.5 v0.5 c0,2,-1.8,3.5,-3.5,3.5 h-2.5" fill="none" stroke="${pinBgColor}" stroke-width="2" />
-        <path d="M12,10.5 l3,-1.8" fill="none" stroke="${pinBgColor}" stroke-width="1.5" stroke-linecap="round"/>
-        <rect x="4" y="3" width="8" height="9" rx="2" fill="${pinBgColor}" />
-        <rect x="2" y="4.5" width="2" height="5" rx="0.5" fill="${pinBgColor}" />
-        <path d="M3,7 C 0.5,7 -1.5,9 -1.5,12.5" fill="none" stroke="${pinBgColor}" stroke-width="2" stroke-linecap="round" />
-        <circle cx="-1.5" cy="16" r="1.5" fill="${pinBgColor}" />
-      </g>
-      ${svgExtra}
-    </svg>`)}`,
-                      scaledSize: new window.google.maps.Size(40, 40),
-                      anchor: new window.google.maps.Point(20, 40),
+                      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svgContent)}`,
+                      scaledSize: new window.google.maps.Size(showBalloon ? 130 : 44, 44),
+                      anchor: new window.google.maps.Point(22, 40),
                     }}
                   />
                 );
@@ -5253,7 +5856,7 @@ function SearchFuelView({
 
         {/* Selected Station Mobile Card (Floating) */}
         {selectedStation && (() => {
-          const prices = gasStations
+          const prices = filteredStations
             .map(s => parseFloat(s.price))
             .filter(p => !isNaN(p) && p > 0);
           const maxP = prices.length > 0 ? Math.max(...prices) : 0;
@@ -5263,6 +5866,7 @@ function SearchFuelView({
           
           const isCheapest = !isNaN(priceNum) && priceNum === minP && prices.length > 1;
           const isExpensive = !isNaN(priceNum) && priceNum > avgP;
+          const stationEconomy = !isNaN(priceNum) && maxP > priceNum ? maxP - priceNum : 0;
           
           // Calculate textColor based on identical interpolation to be perfectly consistent
           let dynColor = '';
@@ -5302,24 +5906,37 @@ function SearchFuelView({
                 <X size={18} />
               </button>
               
-              <div className="pr-6 mb-2.5">
-                <h4 className="font-bold text-sm text-white leading-tight uppercase flex items-start gap-1.5">
-                  {isCheapest && (
-                    <span className="text-base shadow-amber-500/50 drop-shadow-md flex-shrink-0 mt-[1px]" title="Posto Mais Barato encontrado!">🏆</span>
-                  )}
-                  <span className="line-clamp-2">{selectedStation.nm_posto}</span>
-                </h4>
-                <p className="text-[9px] text-primary tracking-widest uppercase font-bold mt-1">
-                  {selectedStation.nm_bandeira || 'Bandeira Branca'}
-                </p>
+              <div className="flex items-start gap-2.5 pr-6 mb-2.5">
+                <div className="flex-shrink-0">
+                  {getStationBrandSvg(selectedStation.nm_bandeira)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-sm text-white leading-tight uppercase flex items-start gap-1.5">
+                    {isCheapest && (
+                      <span className="text-base shadow-amber-500/50 drop-shadow-md flex-shrink-0 mt-[1px]" title="Posto Mais Barato encontrado!">🏆</span>
+                    )}
+                    <span className="line-clamp-2">{selectedStation.nm_posto}</span>
+                  </h4>
+                  <p className="text-[9px] text-primary tracking-widest uppercase font-bold mt-1">
+                    {selectedStation.nm_bandeira || 'Bandeira Branca'}
+                  </p>
+                </div>
               </div>
               
-              <div className="flex items-end justify-between bg-surface-container-low p-2 rounded-xl border border-outline-variant/10">
-                <div>
-                  <span className="text-[9px] uppercase font-bold tracking-widest text-on-surface-variant">Preço</span>
-                  <p className="text-xl font-black text-white leading-none mt-1" style={{ color: dynColor }}>
+              <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-xl border border-outline-variant/10">
+                <div className="flex flex-col gap-1.5 justify-center">
+                  <span className="text-[9px] uppercase font-bold tracking-widest text-on-surface-variant leading-none">Preço</span>
+                  <p className="text-xl font-black text-white leading-none" style={{ color: dynColor }}>
                     R$ {formatNumber(priceNum, 3)}
                   </p>
+                  {stationEconomy > 0 && (
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className="text-[8px] uppercase font-black tracking-widest text-[#ccff00]/80">ECONOMIZE ATÉ:</span>
+                      <span className="text-[11px] sm:text-xs font-black text-[#ccff00] leading-none drop-shadow-[0_0_6px_rgba(204,255,0,0.3)]">
+                        R$ {formatNumber(stationEconomy, 2)}/L
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <div className="text-right flex flex-col items-end gap-1.5 opacity-95">
                   {/* Badge de Origem do Preço */}
@@ -5398,7 +6015,7 @@ function SearchFuelView({
 
         {/* Action Buttons always visible */}
         <>
-          <div className={`absolute z-10 transition-all ${isMaximized ? 'left-4 top-8' : 'left-3 top-3'}`}>
+          <div className={`absolute z-30 transition-all ${isMaximized ? 'left-4 top-8' : 'left-3 top-3'}`}>
             <button 
               onClick={() => setIsMaximized(!isMaximized)}
               className={`bg-[#111111] border border-primary/40 text-primary flex items-center justify-center shadow-lg active:scale-95 transition-all hover:bg-primary/10 ${isMaximized ? 'w-12 h-12 rounded-full' : 'p-2 rounded-xl'}`}
@@ -5408,7 +6025,7 @@ function SearchFuelView({
             </button>
           </div>
           
-          <div className={`absolute z-10 transition-all ${isMaximized ? 'right-4 top-8' : 'right-3 top-3'}`}>
+          <div className={`absolute z-30 transition-all ${isMaximized ? 'right-4 top-8' : 'right-3 top-3'}`}>
             <button 
               onClick={() => {
                 const zoom = Math.max(10, Math.round(15 - Math.log2(radius || 5)));
@@ -5431,6 +6048,16 @@ function SearchFuelView({
           </div>
         </>
       </div>
+
+      {/* Price Reference Card (Subtle & Elegant Statistical Summary) inline */}
+      {gasStations.length > 0 && selectedFuel && (
+        <PriceReferenceCard 
+          gasStations={gasStations} 
+          fuelName={fuelTypes.find(f => f.id_produto === selectedFuel)?.friendlyName || fuelTypes.find(f => f.id_produto === selectedFuel)?.ds_produto || "Combustível"} 
+          radius={radius}
+          locationName={locationName}
+        />
+      )}
 
       {/* Fuel Types */}
       <section>
@@ -5465,6 +6092,67 @@ function SearchFuelView({
             )}
           </div>
         )}
+      </section>
+
+      {/* Filtro por Bandeira */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Flag size={18} className="text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]" />
+            <h3 className="text-xs font-bold tracking-widest text-white uppercase">Bandeiras</h3>
+          </div>
+          {selectedBrands.length > 0 && (
+            <button
+              id="btn-clear-brands"
+              type="button"
+              onClick={() => setSelectedBrands([])}
+              className="text-[9px] font-black text-amber-400/80 hover:text-amber-400 hover:scale-105 active:scale-95 transition-all uppercase tracking-wider bg-white/5 px-2.5 py-1 rounded-full border border-amber-400/20"
+            >
+              Limpar Filtros ({selectedBrands.length})
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-4 gap-2">
+          {BRAND_OPTIONS.map((brand) => {
+            const isSelected = selectedBrands.includes(brand.id);
+            return (
+              <button
+                id={`brand-filter-${brand.id}`}
+                key={brand.id}
+                type="button"
+                onClick={() => {
+                  setSelectedBrands((prev) =>
+                    prev.includes(brand.id)
+                      ? prev.filter((id) => id !== brand.id)
+                      : [...prev, brand.id]
+                  );
+                }}
+                className={`relative group flex flex-col items-center justify-center p-2.5 rounded-2xl border transition-all duration-300 ${
+                  isSelected
+                    ? "bg-amber-400/10 border-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.15)] scale-[1.02]"
+                    : "bg-surface-container border-white/5 hover:border-white/15 hover:bg-surface-container/80"
+                }`}
+              >
+                {/* SVG Logo container */}
+                <div className={`transition-transform duration-300 group-hover:scale-110 ${isSelected ? 'scale-105' : ''}`}>
+                  {brand.svg}
+                </div>
+
+                {/* Brand label */}
+                <span className={`text-[9px] font-black tracking-wider uppercase mt-2 text-center transition-colors duration-200 truncate w-full ${
+                  isSelected ? 'text-amber-400' : 'text-white/60 group-hover:text-white/80'
+                }`}>
+                  {brand.label}
+                </span>
+
+                {/* Selection Micro indicator dot */}
+                <div className={`absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                  isSelected ? 'bg-amber-400 scale-100 shadow-[0_0_6px_#fbbf24]' : 'bg-transparent scale-0'
+                }`} />
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       {/* Search Radius */}
@@ -5600,5 +6288,231 @@ function FuelOption({ id, label, selected, onClick }: { id: string, label: strin
     >
       {label}
     </button>
+  );
+}
+
+function PriceReferenceCard({ 
+  gasStations, 
+  fuelName, 
+  radius, 
+  locationName 
+}: { 
+  gasStations: any[], 
+  fuelName: string, 
+  radius: number, 
+  locationName: string 
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const stats = useMemo(() => {
+    if (!gasStations || gasStations.length === 0) return null;
+    
+    // Normalization helper for Brazilian cities / accents
+    const normalizeText = (text: string): string => {
+      return text
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toUpperCase();
+    };
+
+    // Extract current GPS / search center city
+    const userCityNormalized = locationName ? normalizeText(locationName.split(' - ')[0]) : "PETROPOLIS";
+    const activeCity = userCityNormalized.includes("BUSCANDO") ? "PETROPOLIS" : userCityNormalized;
+
+    // Filter gas stations belonging to the active city to calculate average price ("Preço Médio no município")
+    const cityStations = gasStations.filter(s => s.nm_municipio && normalizeText(s.nm_municipio) === activeCity);
+    
+    // Fallback if no stations in the current city are present in the list
+    const stationsForMuniAvg = cityStations.length > 0 ? cityStations : gasStations;
+    const muniPrices = stationsForMuniAvg.map(s => parseFloat(s.price)).filter(p => !isNaN(p) && p > 0);
+    const avgPrice = muniPrices.length > 0 ? muniPrices.reduce((a, b) => a + b, 0) / muniPrices.length : 0;
+
+    // All prices inside the search radius
+    const radiusPrices = gasStations.map(s => parseFloat(s.price)).filter(p => !isNaN(p) && p > 0);
+    if (radiusPrices.length === 0) return null;
+
+    const minPrice = Math.min(...radiusPrices);
+    const maxPrice = Math.max(...radiusPrices);
+    
+    // Economy is always absolute lowest price in radius compared with absolute highest price in radius
+    const economy = Math.max(0, maxPrice - minPrice);
+    
+    const cheaperPrices = radiusPrices.filter(p => p <= avgPrice);
+    const expensivePrices = radiusPrices.filter(p => p > avgPrice);
+    
+    const countCheaper = cheaperPrices.length;
+    const countExpensive = expensivePrices.length;
+    
+    const avgCheaper = countCheaper > 0 ? cheaperPrices.reduce((a, b) => a + b, 0) / countCheaper : 0;
+    const avgExpensive = countExpensive > 0 ? expensivePrices.reduce((a, b) => a + b, 0) / countExpensive : 0;
+    
+    // Determine the unique municipalities present among stations in radius
+    const uniqueMunicipiosInRadius = Array.from(
+      new Set(
+        gasStations
+          .map(s => s.nm_municipio)
+          .filter(m => m && m.trim().length > 0)
+          .map(m => m.trim().toUpperCase())
+      )
+    );
+
+    let titleLabel = "";
+    if (uniqueMunicipiosInRadius.length === 1) {
+      const rawMuni = gasStations.find(s => s.nm_municipio && s.nm_municipio.trim().toUpperCase() === uniqueMunicipiosInRadius[0])?.nm_municipio || uniqueMunicipiosInRadius[0];
+      const formattedMuni = rawMuni.trim().toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+      titleLabel = `Economize em ${formattedMuni}`;
+    } else if (uniqueMunicipiosInRadius.length > 1) {
+      titleLabel = "Economize nessa região";
+    } else {
+      titleLabel = "Economize";
+    }
+
+    return {
+      minPrice,
+      maxPrice,
+      avgPrice,
+      countCheaper,
+      countExpensive,
+      avgCheaper,
+      avgExpensive,
+      economy,
+      titleLabel,
+      totalPostos: radiusPrices.length
+    };
+  }, [gasStations, locationName]);
+
+  if (!stats) return null;
+
+  return (
+    <div className="bg-surface-container border border-outline-variant/10 rounded-3xl overflow-hidden shadow-xl transition-all duration-300">
+      {/* Header Toggle */}
+      <button 
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-5 py-4 flex items-center justify-between bg-surface-container-high hover:bg-surface-container-highest transition-colors text-left cursor-pointer"
+      >
+        <div className="flex items-center gap-2">
+          <Coins size={18} className="text-[#ccff00] drop-shadow-[0_0_6px_rgba(204,255,0,0.5)]" />
+          <span className="text-[11px] font-black tracking-widest text-[#ccff00] uppercase">
+            {stats.titleLabel}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {stats.economy > 0 && (
+            <span className="text-xs sm:text-sm font-black px-3 py-1 bg-[#ccff00]/10 text-[#ccff00] rounded-full border border-[#ccff00]/20 uppercase tracking-wider whitespace-nowrap">
+              R$ {formatNumber(stats.economy, 2)}/L
+            </span>
+          )}
+          <div className="text-white/60 bg-white/5 p-1.5 rounded-full border border-white/5 hover:bg-white/10 transition-all duration-200 flex items-center justify-center">
+            {isOpen ? <ChevronUp size={16} className="text-[#ccff00]" /> : <ChevronDown size={16} />}
+          </div>
+        </div>
+      </button>
+
+      {/* Expandable Body */}
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden bg-[#111111]/40"
+          >
+            <div className="p-5 flex flex-col items-center">
+              {/* Semi-circular concentric Gauge */}
+              <div className="relative w-full max-w-[240px] h-[175px] flex flex-col items-center justify-between mb-4">
+                
+                {/* Preço Médio no Município raised entirely above the arc */}
+                <div className="text-center z-10 pt-1 flex flex-col items-center">
+                  <span className="text-white/40 text-[9px] font-black uppercase tracking-widest leading-none mb-1.5">
+                    Preço Médio no município
+                  </span>
+                  
+                  <div className="flex items-start justify-center text-white font-sans">
+                    <span className="text-sm font-black text-white/50 mr-0.5 mt-0.5">R$</span>
+                    <span className="text-4xl sm:text-5xl font-black tracking-tight leading-none text-white">
+                      {formatNumber(stats.avgPrice, 3)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Semicircular Gauge: Shifted cleanly to bottom */}
+                <svg width="240" height="150" viewBox="0 0 240 150" className="absolute bottom-0">
+                  {/* Outer secondary track */}
+                  <path
+                    d="M 40 140 A 80 80 0 1 1 200 140"
+                    fill="none"
+                    stroke="#889955"
+                    strokeWidth="11"
+                    strokeLinecap="round"
+                    className="opacity-25"
+                  />
+                  {/* Outer active level */}
+                  <path
+                    d="M 40 140 A 80 80 0 1 1 200 140"
+                    fill="none"
+                    stroke="#ccff00"
+                    strokeWidth="11"
+                    strokeLinecap="round"
+                    strokeDasharray="335"
+                    strokeDashoffset={stats.economy > 0 ? (335 - Math.min(320, (stats.economy / Math.max(1, stats.avgPrice)) * 1400)) : 335}
+                    className="transition-all duration-1000 ease-out"
+                  />
+                </svg>
+
+                {/* Inner Overlay Content positioned inside the arc */}
+                <div className="absolute inset-x-0 bottom-1.5 flex flex-col items-center text-center z-10">
+                  <span className="text-white/60 text-[9px] font-black tracking-widest uppercase leading-none mt-1">
+                    Economia de Até:
+                  </span>
+                  <span className="text-[#ccff00] text-xl sm:text-2xl font-black tracking-tighter leading-none mt-1.5 drop-shadow-[0_0_8px_rgba(204,255,0,0.5)]">
+                    R$ {formatNumber(stats.economy, 2)}/litro
+                  </span>
+                  
+                  <span className="text-white/40 text-[9px] font-black tracking-widest uppercase mt-3 leading-none">
+                    {fuelName}
+                  </span>
+                </div>
+              </div>
+
+              {/* Data Table */}
+              <div className="w-full bg-[#111111]/90 rounded-2xl overflow-hidden divide-y divide-white/5 border border-white/5 shadow-inner">
+                {/* Header of Table */}
+                <div className="grid grid-cols-12 gap-1 p-3 bg-white/5 text-[9px] font-black uppercase tracking-widest text-[#ccff00]">
+                  <div className="col-span-6 flex items-center">
+                    Alcance do Radar: <span className="text-white ml-1 font-black">{radius} km</span>
+                  </div>
+                  <div className="col-span-3 text-center">Postos</div>
+                  <div className="col-span-3 text-right">Média</div>
+                </div>
+
+                {/* Region Average Row */}
+                <div className="grid grid-cols-12 gap-1 px-3 py-2.5 text-xs text-white/90">
+                  <div className="col-span-6 font-medium text-white/60 text-[11px] uppercase tracking-wider">Média de preço na região:</div>
+                  <div className="col-span-3 text-center font-bold text-white/70">{stats.totalPostos}</div>
+                  <div className="col-span-3 text-right font-black text-white">R$ {formatNumber(stats.avgPrice, 3)}</div>
+                </div>
+
+                {/* Cheaper Row */}
+                <div className="grid grid-cols-12 gap-1 px-3 py-2.5 text-xs text-white/90">
+                  <div className="col-span-6 font-medium text-[#ccff00]/80 text-[11px] uppercase tracking-wider">Mais baratos que a média:</div>
+                  <div className="col-span-3 text-center font-bold text-[#ccff00]/60">{stats.countCheaper}</div>
+                  <div className="col-span-3 text-right font-black text-[#ccff00] drop-shadow-[0_0_4px_rgba(204,255,0,0.15)]">R$ {formatNumber(stats.avgCheaper, 3)}</div>
+                </div>
+
+                {/* Expensive Row */}
+                <div className="grid grid-cols-12 gap-1 px-3 py-2.5 text-xs text-white/90">
+                  <div className="col-span-6 font-medium text-red-400/80 text-[11px] uppercase tracking-wider">Mais caros que a média:</div>
+                  <div className="col-span-3 text-center font-bold text-red-400/60">{stats.countExpensive}</div>
+                  <div className="col-span-3 text-right font-black text-red-400">R$ {formatNumber(stats.avgExpensive, 3)}</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

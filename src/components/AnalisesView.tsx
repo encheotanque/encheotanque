@@ -4,11 +4,9 @@ import {
   TrendingUp, 
   Trophy,
   ChartBarIcon,
-  Map,
 } from 'lucide-react';
 import { InsightsView } from './InsightsView';
 import { RankingsView } from './RankingsView';
-import { CoverageMapView } from './CoverageMapView';
 
 interface AnalisesViewProps {
   fuelTypes: { id_produto: number; nm_produto?: string; ds_produto?: string; friendlyName?: string }[];
@@ -17,7 +15,7 @@ interface AnalisesViewProps {
 }
 
 export const AnalisesView: React.FC<AnalisesViewProps> = ({ fuelTypes, initialCity, selectedVehicle }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'insights' | 'rankings' | 'mapa'>('insights');
+  const [activeSubTab, setActiveSubTab] = useState<'insights' | 'rankings'>('insights');
 
   return (
     <div className="flex flex-col h-full bg-background font-sans">
@@ -46,17 +44,6 @@ export const AnalisesView: React.FC<AnalisesViewProps> = ({ fuelTypes, initialCi
             <Trophy size={16} />
             <span>Rankings</span>
           </button>
-          <button
-            onClick={() => setActiveSubTab('mapa')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${
-              activeSubTab === 'mapa'
-                ? 'bg-primary text-black shadow-lg shadow-primary/20'
-                : 'text-white/40 hover:bg-white/5 hover:text-white/70'
-            }`}
-          >
-            <Map size={16} />
-            <span>Mapa</span>
-          </button>
         </div>
       </div>
 
@@ -73,7 +60,7 @@ export const AnalisesView: React.FC<AnalisesViewProps> = ({ fuelTypes, initialCi
             >
               <InsightsView initialCity={initialCity} selectedVehicle={selectedVehicle} />
             </motion.div>
-          ) : activeSubTab === 'rankings' ? (
+          ) : (
             <motion.div
               key="rankings"
               initial={{ opacity: 0, x: 20 }}
@@ -82,16 +69,6 @@ export const AnalisesView: React.FC<AnalisesViewProps> = ({ fuelTypes, initialCi
               className="h-full overflow-y-auto no-scrollbar"
             >
               <RankingsView fuelTypes={fuelTypes} initialCity={initialCity} />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="mapa"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="h-full overflow-y-auto no-scrollbar"
-            >
-              <CoverageMapView />
             </motion.div>
           )}
         </AnimatePresence>

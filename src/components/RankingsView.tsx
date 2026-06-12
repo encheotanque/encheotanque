@@ -368,10 +368,10 @@ export const RankingsView: React.FC<RankingsViewProps> = ({ fuelTypes, initialCi
                 {formatPrice(data.cityAverage)}
               </h4>
             </div>
-            <div className="text-right">
+            <div className="text-right flex flex-col items-end">
               <p className="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em]">Melhor Oportunidade</p>
               <p className="text-white font-bold text-xs">
-                Poupança de até <span className="text-green-400">R$ 0,45/L</span>
+                Economia de até <span className="text-green-400">R$ 0,45/L</span>
               </p>
             </div>
           </motion.div>
